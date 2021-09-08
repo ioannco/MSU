@@ -21,6 +21,8 @@ int main ()
 
     while (user_input != 'n')
     {
+        printf ("enter equation coeffitients: ");
+
         if (scanf ("%lf %lf %lf", &a, &b, &c) != 3)
         {
             printf ("wrong coeffitients count!\n");
@@ -40,16 +42,18 @@ int main ()
                 break;
                 
             case one_root:
-                printf ("%.2lf\n", root1);
+                printf ("root: %.2lf\n", root1);
                 break;
 
             case two_roots:
-                printf ("%.2lf %.2lf\n", root1, root2);
+                printf ("roots: %.2lf %.2lf\n", root1, root2);
                 break;
 
             default:
                 printf ("unexpected solve result\n");
         }
+
+        printf ("continue<n/y>? ");
 
         if (scanf (" %c", &user_input) != 1)
         {
