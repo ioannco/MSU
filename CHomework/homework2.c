@@ -28,17 +28,21 @@ void           print_day       (unsigned short  date);
 void           print_month     (unsigned short  date);
 void           print_year      (unsigned short  date);
 
+void           flush_input     ();
+
 int main ()
 {
     unsigned int day, month, year;
     unsigned short compact;
+    int running = 1;
     
     while (1)
     {
         printf ("Enter date (DD MM YY): ");
         if (scanf (" %u %u %u", &day, &month, &year) != 3 || day > 31 || month > 12 || year > 99)
         {
-            printf ("Sorry, incorrect date. Try again.\n");
+            printf ("Sorry, incorrect date. Try again.\n\n");
+            flush_input ();
             continue;
         }
         else
@@ -52,12 +56,12 @@ int main ()
     printf ("(2)     Print month\n");
     printf ("(3)     Print year\n");
     printf ("(4)     Set day\n");
-    printf ("(5)     Set month");
+    printf ("(5)     Set month\n");
     printf ("(6)     Set year\n");
     printf ("(7)     Print binary\n");
     printf ("(other) Exit.\n"); 
 
-    while (1)
+    while (running)
     {
         char input = ' ';
         printf ("\nEnter command: ");
@@ -68,28 +72,35 @@ int main ()
         {
         case print_date_cmd:
             compact_to_date (compact, &day, &month, &year);
-            printf ("Current date: %u//%u//%u\n", day, month, year);
+            printf ("Current date: %u/%u/%u\n", day, month, year);
             break;
 
         case print_day_cmd:
+            print_day (compact);
             break;
             
         case print_month_cmd:
+            print_month (compact);
             break;
 
         case print_year_cmd:
+            print_year (compact);
             break;
 
         case set_day_cmd:
             compact = set_day (compact);
+            printf ("Success!\n");
             break;
 
         case set_month_cmd:
             compact = set_month (compact);
+            printf ("Success!\n");
+
             break;
 
         case set_year_cmd:
             compact = set_year (compact);
+            printf ("Success!\n");
             break;
 
         case print_binary_cmd:
@@ -100,7 +111,8 @@ int main ()
             
         default:
             printf ("Bye!\n");
-            exit (0);
+            running = 0;
+            break;
         }
 
     }
@@ -140,44 +152,66 @@ void print_binary (unsigned short date)
 
 unsigned short set_day (unsigned short date)
 {
-    unsigned short day = 0;
+    unsigned int day = 0;
     
-    fflush(stdin);
-
     printf ("Enter day: ");
-    if (scanf ("%u", &day) != 1 || day > 31)
+    while (scanf ("%u", &day) != 1 || day > 31)
     {
-        printf ("Incorrect day format\n");
-        exit (0);
+        printf ("Incorrect day format, try again: ");
+        flush_input();
     }
     
-    return (date & ~day_mask_c) | day;
+    return (date & ~day_mask_c) | (short) day;
 }
 
 unsigned short set_month (unsigned short date)
 {
-    unsigned short month = 0;
+    unsigned int month = 0;
 
     printf ("Enter month: ");
-    if (scanf (" %u", &month) != 1 || month > 12)
+    while (scanf ("%u", &month) != 1 || month > 12)
     {
-        printf ("Incorrect month format\n");
-        exit (0);
+        printf ("Incorrect month format, try again: ");
+        flush_input();
     }
 
-    return (date & ~month_mask_c) | (month << 5); 
+    return (date & ~month_mask_c) | (short) (month << 5); 
 } 
 
 unsigned short set_year (unsigned short date)
 {
-    unsigned short year = 0;
+    unsigned int year = 0;
 
     printf ("Enter year: ");
-    if (scanf ("%u", &year) != 1 || year > 99)
+    while (scanf ("%u", &year) != 1 || year > 99)
     {
-        printf ("Incorrect year format\n");
-        exit (0);
+        printf ("Incorrect year format, try again: ");
+        flush_input ();
     }
 
-    return (date & ~year_mask_c) | (year << 9); 
-} 
+    return (date & ~year_mask_c) | (short) (year << 9); 
+}
+
+void print_day (unsigned short date)
+{
+    printf ("Day: %u\n", date & day_mask_c);
+}
+
+void print_month (unsigned short date)
+{
+    printf ("Month: %u\n", (date & month_mask_c) >> 5);
+}
+
+void print_year (unsigned short date)
+{
+    int year = (date & year_mask_c) >> 9;
+
+    printf ("Year: %u\n", year > 49 ? 1900 + year : 2000 + year);
+}
+
+void flush_input ()
+{
+    int c = 0;
+
+    while ((c = getchar()) != '\n' && c != EOF);
+}
