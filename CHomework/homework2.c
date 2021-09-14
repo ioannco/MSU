@@ -50,6 +50,7 @@ int main ()
     }
 
     printf ("List of commands:\n\n");
+
     printf ("(0)     Print date\n");
     printf ("(1)     Print day\n");
     printf ("(2)     Print month\n");
