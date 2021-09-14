@@ -21,43 +21,41 @@ int main ()
 
     while (user_input != 'n')
     {
-        printf ("enter equation coeffitients: ");
+        printf ("Enter equation coefficients: ");
 
         if (scanf ("%lf %lf %lf", &a, &b, &c) != 3)
         {
-            printf ("wrong coeffitients count!\n");
+            printf ("Wrong coefficients format.\n");
             return 0;
         }
-        
-        solve_status = solve_quad_eq (a, b, c, &root1, &root2);
-        
-        switch (solve_status)
+
+        switch (solve_quad_eq (a, b, c, &root1, &root2))
         {
             case no_roots:
-                printf ("no roots\n");
+                printf ("No roots\n");
                 break;
 
             case inf_roots:
-                printf ("infinite roots\n");
+                printf ("Infinite roots\n");
                 break;
                 
             case one_root:
-                printf ("root: %.2lf\n", root1);
+                printf ("Root: %.2lf\n", root1);
                 break;
 
             case two_roots:
-                printf ("roots: %.2lf %.2lf\n", root1, root2);
+                printf ("Roots: %.2lf %.2lf\n", root1, root2);
                 break;
 
             default:
-                printf ("unexpected solve result\n");
+                printf ("Unexpected solve result\n");
         }
 
-        printf ("continue<n/y>? ");
+        printf ("\nContinue<n/y>? ");
 
         if (scanf (" %c", &user_input) != 1)
         {
-           printf ("expected exit condition\n");
+           printf ("Expected exit condition\n");
            return 0; 
         }
     }
