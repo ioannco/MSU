@@ -147,6 +147,8 @@ void print_binary (unsigned short date)
     {
         int num = (date >> i) & 1;
         printf ("%d", num);
+        if (i == 8)
+            printf (" ");
     }
 }
 
