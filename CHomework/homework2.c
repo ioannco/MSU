@@ -38,7 +38,7 @@ int main ()
     while (1)
     {
         printf ("Enter date (DD MM YY): ");
-        if (scanf (" %u %u %u", &day, &month, &year) != 3 || day > 31 || month > 12 || year > 99)
+        if (scanf ("%u %u %u", &day, &month, &year) != 3 || day > 31 || month > 12 || year > 99)
         {
             printf ("Sorry, incorrect date. Try again.\n\n");
             flush_input ();
