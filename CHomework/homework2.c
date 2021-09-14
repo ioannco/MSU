@@ -17,15 +17,15 @@ const unsigned short day_mask_c = 0x001F, month_mask_c = 0x01E0, year_mask_c = 0
 unsigned short date_to_compact (                     unsigned int   day, unsigned int   month, unsigned int   year);
 void           compact_to_date (unsigned short date, unsigned int * day, unsigned int * month, unsigned int * year);
 
-void           print_binary    (unsigned short  date);
+void           print_binary    (unsigned short date);
 
-unsigned short set_day         (unsigned short  date);
-unsigned short set_month       (unsigned short  date);
-unsigned short set_year        (unsigned short  date);
+unsigned short set_day         (unsigned short date);
+unsigned short set_month       (unsigned short date);
+unsigned short set_year        (unsigned short date);
 
-void           print_day       (unsigned short  date);
-void           print_month     (unsigned short  date);
-void           print_year      (unsigned short  date);
+void           print_day       (unsigned short date);
+void           print_month     (unsigned short date);
+void           print_year      (unsigned short date);
 
 void           flush_input     ();
 
