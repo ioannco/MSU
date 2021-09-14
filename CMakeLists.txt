@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project (Homework)
 
-file (GLOB MY_SOURCES */*.c)
+file (GLOB MY_SOURCES **/*.c)
 
 foreach  (source_file ${MY_SOURCES})
     get_filename_component(source_name ${source_file} NAME_WE)
