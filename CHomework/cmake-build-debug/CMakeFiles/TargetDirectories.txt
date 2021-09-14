@@ -1,4 +1,0 @@
-/home/master/Code/MSU/CHomework/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/master/Code/MSU/CHomework/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/master/Code/MSU/CHomework/cmake-build-debug/CMakeFiles/homework2.dir
-/home/master/Code/MSU/CHomework/cmake-build-debug/CMakeFiles/homework1.dir
