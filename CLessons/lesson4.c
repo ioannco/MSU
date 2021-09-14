@@ -12,7 +12,7 @@ int main1 ()
     return 0;
 }
 
-int main2 ()
+int main ()
 {
     int x = 1, y = 2, z;
 
