@@ -10,6 +10,7 @@ enum solve_status_t
 };
 
 enum solve_status_t solve_quad_eq (double a, double b, double c, double * root1, double * root2);
+void flush_input ();
 
 int main ()
 {
@@ -58,6 +59,8 @@ int main ()
            printf ("Expected exit condition\n");
            return 0; 
         }
+
+        flush_input ();
     }
 
     return 0;
@@ -95,4 +98,11 @@ enum solve_status_t solve_quad_eq (double a, double b, double c, double * root1,
     *root2 = (-b - sqrt(D)) / (2 * a);
 
     return two_roots;
+}
+
+void flush_input ()
+{
+    int c;
+
+    while ((c = getchar()) != '\n' && c != EOF);
 }
