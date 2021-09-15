@@ -1,54 +1,68 @@
 #include <stdio.h>
 
+// Lists of commands
 enum commands 
 {
-    print_date_cmd = '0',
-    print_day_cmd,
-    print_month_cmd,
-    print_year_cmd,
-    set_day_cmd,
-    set_month_cmd,
-    set_year_cmd,
-    print_binary_cmd
+    PRINT_DATE_CMD = '0',
+    PRINT_DAY_CMD,
+    PRINT_MONTH_CMD,
+    PRINT_YEAR_CMD,
+    SET_DAY_CMD,
+    SET_MONTH_CMD,
+    SET_YEAR_CMD,
+    PRINT_BINARY_CMD
 };
 
+// Compact data masks
 const unsigned short day_mask_c = 0x001F, month_mask_c = 0x01E0, year_mask_c = 0xFE00;
 
+// Pack date to more compact container
 unsigned short date_to_compact (                     unsigned int   day, unsigned int   month, unsigned int   year);
+// Unpack date
 void           compact_to_date (unsigned short date, unsigned int * day, unsigned int * month, unsigned int * year);
 
+// Print short value in binary representation
 void           print_binary    (unsigned short date);
 
+// Set day in packed date
 unsigned short set_day         (unsigned short date);
+// Set month in packed date
 unsigned short set_month       (unsigned short date);
+// Set year in packed date
 unsigned short set_year        (unsigned short date);
 
+// Get day from packed date and print it
 void           print_day       (unsigned short date);
+// Get month from packed date and print it
 void           print_month     (unsigned short date);
+// Get year form packed date and print it
 void           print_year      (unsigned short date);
 
+// Flush the console buffer
 void           flush_input     ();
 
 int main ()
 {
-    unsigned int day, month, year;
-    unsigned short compact;
-    int running = 1;
-    
+    unsigned int day, month, year; // Date
+    unsigned short compact;        // Compact container
+    int running = 1;               // Exit condition
+
+    // Asking to enter coefficients until they are correct
     while (1)
     {
         printf ("Enter date (DD MM YY): ");
         if (scanf ("%u %u %u", &day, &month, &year) != 3 || day > 31 || month > 12 || year > 99)
         {
             printf ("Sorry, incorrect date. Try again.\n\n");
-            flush_input ();
+            flush_input ();  // Clear input and try again
             continue;
         }
         else
-            compact = date_to_compact (day, month, year);
+            compact = date_to_compact (day, month, year); // If input is correct, pack date to compact container
             break;
     }
 
+    // Print list of commands
     printf ("List of commands:\n\n");
 
     printf ("(0)     Print date\n");
@@ -61,55 +75,57 @@ int main ()
     printf ("(7)     Print binary\n");
     printf ("(other) Exit.\n"); 
 
+    // Main cycle
     while (running)
     {
-        char input = ' ';
-        printf ("\nEnter command: ");
+        char input = ' ';                           // User input character
 
+        printf ("\nEnter command: ");        // Command input
         scanf (" %c", &input);
 
+        // Command parse switch
         switch (input)
         {
-        case print_date_cmd:
+        case PRINT_DATE_CMD:  // Print date
             compact_to_date (compact, &day, &month, &year);
             printf ("Current date: %u/%u/%u\n", day, month, year);
             break;
 
-        case print_day_cmd:
+        case PRINT_DAY_CMD:   // Print day only
             print_day (compact);
             break;
             
-        case print_month_cmd:
+        case PRINT_MONTH_CMD: // Print month only
             print_month (compact);
             break;
 
-        case print_year_cmd:
+        case PRINT_YEAR_CMD:  // Print year only
             print_year (compact);
             break;
 
-        case set_day_cmd:
+        case SET_DAY_CMD:     // Set day
             compact = set_day (compact);
             printf ("Success!\n");
             break;
 
-        case set_month_cmd:
+        case SET_MONTH_CMD:   // Set month
             compact = set_month (compact);
             printf ("Success!\n");
 
             break;
 
-        case set_year_cmd:
+        case SET_YEAR_CMD:    // Set year
             compact = set_year (compact);
             printf ("Success!\n");
             break;
 
-        case print_binary_cmd:
+        case PRINT_BINARY_CMD: // Print compact container in binary representation
             printf ("Stored date in binary: \n");
             print_binary (compact);
             printf ("\n");
             break;
             
-        default:
+        default:               // Exit if other command
             printf ("Bye!\n");
             running = 0;
             break;
@@ -121,12 +137,17 @@ int main ()
 
 unsigned short date_to_compact (unsigned int day, unsigned int month, unsigned int year)
 {
-    unsigned short compact = 0;
+    unsigned short compact = 0; // container to store date in
 
+    // Set year and shift
     compact = year;
     compact = compact << 4;
+
+    // Set month and shift
     compact += month;
     compact = compact << 5;
+
+    // Set day
     compact += day;
     
     return compact;
@@ -134,6 +155,7 @@ unsigned short date_to_compact (unsigned int day, unsigned int month, unsigned i
 
 void compact_to_date (unsigned short date, unsigned int * day, unsigned int * month, unsigned int * year)
 {
+    // Using mask and shift to get value
     *day   =  date & day_mask_c;
     *month = (date & month_mask_c) >> 5;
     *year  = (date & year_mask_c) >> 9; 
@@ -141,8 +163,10 @@ void compact_to_date (unsigned short date, unsigned int * day, unsigned int * mo
 
 void print_binary (unsigned short date)
 {
+    // Starting from the eldest bit
     int i = 16;
 
+    // Parsing bits
     for (i = 15; i >= 0; i--)
     {
         int num = (date >> i) & 1;
@@ -154,44 +178,47 @@ void print_binary (unsigned short date)
 
 unsigned short set_day (unsigned short date)
 {
+    // Day value
     unsigned int day = 0;
     
     printf ("Enter day: ");
     while (scanf ("%u", &day) != 1 || day > 31)
     {
         printf ("Incorrect day format, try again: ");
-        flush_input();
+        flush_input(); // Try again
     }
     
-    return (date & ~day_mask_c) | (short) day;
+    return (date & ~day_mask_c) | (unsigned short) day;
 }
 
 unsigned short set_month (unsigned short date)
 {
+    // Month value
     unsigned int month = 0;
 
     printf ("Enter month: ");
     while (scanf ("%u", &month) != 1 || month > 12)
     {
         printf ("Incorrect month format, try again: ");
-        flush_input();
+        flush_input(); // Try again
     }
 
-    return (date & ~month_mask_c) | (short) (month << 5); 
+    return (date & ~month_mask_c) | (unsigned short) (month << 5);
 } 
 
 unsigned short set_year (unsigned short date)
 {
+    // Year value
     unsigned int year = 0;
 
     printf ("Enter year: ");
     while (scanf ("%u", &year) != 1 || year > 99)
     {
         printf ("Incorrect year format, try again: ");
-        flush_input ();
+        flush_input (); // Try again
     }
 
-    return (date & ~year_mask_c) | (short) (year << 9); 
+    return (date & ~year_mask_c) | (unsigned short) (year << 9);
 }
 
 void print_day (unsigned short date)
