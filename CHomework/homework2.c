@@ -15,13 +15,7 @@
 
 // EOF check macro
 // output - scanf output code
-#ifndef CHECK_EOF
-
 #define CHECK_EOF(output)  if (output == EOF) { $frd printf ("\nSorry, reached end of input stream, aborting...\n\a"); $def exit(0); }
-
-#else
-#error  CHECK_EOF define collision
-#endif
 
 //===============================================================================================================
 
@@ -45,26 +39,21 @@ const unsigned short day_mask_c = 0x001F, month_mask_c = 0x01E0, year_mask_c = 0
 // Function declarations
 //===============================================================================================================
 
-// Pack date to more compact container
+// Pack date to more compact container or vice versa
 unsigned short date_to_compact (                     unsigned int   day, unsigned int   month, unsigned int   year);
-// Unpack date
 void           compact_to_date (unsigned short date, unsigned int * day, unsigned int * month, unsigned int * year);
 
 // Print short value in binary representation
 void           print_binary    (unsigned short date);
 
-// Set day in packed date
+// Set day month, or year in packed date
 unsigned short set_day         (unsigned short date);
-// Set month in packed date
 unsigned short set_month       (unsigned short date);
-// Set year in packed date
 unsigned short set_year        (unsigned short date);
 
-// Get day from packed date and print it
+// Get day month, or year from packed date and print it
 void           print_day       (unsigned short date);
-// Get month from packed date and print it
 void           print_month     (unsigned short date);
-// Get year form packed date and print it
 void           print_year      (unsigned short date);
 
 // Flush the console buffer
@@ -89,7 +78,6 @@ int main ()
         
         if ((scanf_output = scanf ("%u %u %u", &day, &month, &year)) != 3 || day > 31 || month > 12 || year > 99)
         {
-            
             CHECK_EOF(scanf_output);
 
             $fyl
@@ -220,7 +208,7 @@ void compact_to_date (unsigned short date, unsigned int * day, unsigned int * mo
 
 void print_binary (unsigned short date)
 {
-    // Starting from the eldest bit
+    // Starting from the end
     int i = 16;
 
     // Parsing bits
