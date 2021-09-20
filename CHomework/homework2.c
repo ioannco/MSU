@@ -86,9 +86,10 @@ int main ()
             flush_input ();  // Clear input and try again
             continue;
         }
-        else
-            compact = date_to_compact (day, month, year); // If input is correct, pack date to compact container
-            break;
+        
+
+        compact = date_to_compact (day, month, year); // If input is correct, pack date to compact container
+        break;
     }
 
     // Print list of commands
