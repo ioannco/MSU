@@ -1,4 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#ifndef CHECK_EOF
+
+#define CHECK_EOF(output)  if (output == EOF) { printf ("\nSorry, reached end of input stream, aborting...\n\a"); exit(0); }
+
+#else
+#error  CHECK_EOF define collision
+#endif
 
 // Lists of commands
 enum commands 
@@ -46,13 +55,15 @@ int main ()
     unsigned int day, month, year; // Date
     unsigned short compact;        // Compact container
     int running = 1;               // Exit condition
+    int scanf_output = 0;
 
     // Asking to enter coefficients until they are correct
     while (1)
     {
         printf ("Enter date (DD MM YY): ");
-        if (scanf ("%u %u %u", &day, &month, &year) != 3 || day > 31 || month > 12 || year > 99)
+        if ((scanf_output = scanf ("%u %u %u", &day, &month, &year)) != 3 || day > 31 || month > 12 || year > 99)
         {
+            CHECK_EOF(scanf_output);
             printf ("Sorry, incorrect date. Try again.\n\n");
             flush_input ();  // Clear input and try again
             continue;
@@ -81,7 +92,9 @@ int main ()
         char input = ' ';                           // User input character
 
         printf ("\nEnter command: ");        // Command input
-        scanf (" %c", &input);
+        scanf_output = scanf (" %c", &input);
+
+        CHECK_EOF (scanf_output);
 
         // Command parse switch
         switch (input)
@@ -180,10 +193,12 @@ unsigned short set_day (unsigned short date)
 {
     // Day value
     unsigned int day = 0;
+    int scanf_output = 0;
     
     printf ("Enter day: ");
-    while (scanf ("%u", &day) != 1 || day > 31)
+    while ((scanf_output = scanf ("%u", &day)) != 1 || day > 31)
     {
+        CHECK_EOF (scanf_output);
         printf ("Incorrect day format, try again: ");
         flush_input(); // Try again
     }
@@ -195,10 +210,12 @@ unsigned short set_month (unsigned short date)
 {
     // Month value
     unsigned int month = 0;
+    int scanf_output = 0;
 
     printf ("Enter month: ");
-    while (scanf ("%u", &month) != 1 || month > 12)
+    while (scanf_output = (scanf ("%u", &month)) != 1 || month > 12)
     {
+        CHECK_EOF (scanf_output);
         printf ("Incorrect month format, try again: ");
         flush_input(); // Try again
     }
@@ -210,10 +227,13 @@ unsigned short set_year (unsigned short date)
 {
     // Year value
     unsigned int year = 0;
+    int scanf_output = 0;
 
     printf ("Enter year: ");
-    while (scanf ("%u", &year) != 1 || year > 99)
+    while (scanf_output = (scanf ("%u", &year)) != 1 || year > 99)
     {
+        CHECK_EOF (scanf_output);
+
         printf ("Incorrect year format, try again: ");
         flush_input (); // Try again
     }
