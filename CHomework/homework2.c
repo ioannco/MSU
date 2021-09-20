@@ -1,10 +1,17 @@
+//===============================================================================================================
+// Includes
+//===============================================================================================================
+
+// STD
 #include <stdio.h>
 #include <stdlib.h>
 
 // Colors library include
 #include "colors.h"
 
-// ===============================================================================
+//===============================================================================================================
+// Defines and constants
+//===============================================================================================================
 
 // EOF check macro
 // output - scanf output code
@@ -16,7 +23,7 @@
 #error  CHECK_EOF define collision
 #endif
 
-// ===============================================================================
+//===============================================================================================================
 
 // Lists of commands
 enum commands 
@@ -34,7 +41,9 @@ enum commands
 // Compact data masks
 const unsigned short day_mask_c = 0x001F, month_mask_c = 0x01E0, year_mask_c = 0xFE00;
 
-// ===============================================================================
+//===============================================================================================================
+// Function declarations
+//===============================================================================================================
 
 // Pack date to more compact container
 unsigned short date_to_compact (                     unsigned int   day, unsigned int   month, unsigned int   year);
@@ -61,7 +70,9 @@ void           print_year      (unsigned short date);
 // Flush the console buffer
 void           flush_input     ();
 
-// ===============================================================================
+//===============================================================================================================
+// Main
+//===============================================================================================================
 
 int main ()
 {
@@ -72,13 +83,18 @@ int main ()
 
     // Asking to enter coefficients until they are correct
     while (1)
-    { 
-$fmg    printf ("Enter date (DD MM YY): "); 
+    {
+        $fmg
+        printf ("Enter date (DD MM YY): "); 
+        
         if ((scanf_output = scanf ("%u %u %u", &day, &month, &year)) != 3 || day > 31 || month > 12 || year > 99)
         {
             
             CHECK_EOF(scanf_output);
-$fyl        printf ("Sorry, incorrect date. Try again.\n\n");
+
+            $fyl
+            printf ("Sorry, incorrect date. Try again.\n\n");
+            
             flush_input ();  // Clear input and try again
             continue;
         }
@@ -88,9 +104,10 @@ $fyl        printf ("Sorry, incorrect date. Try again.\n\n");
     }
 
     // Print list of commands
-$fbl
+    $fbl
     printf ("\nList of commands:\n\n");
-$def
+    
+    $def
     printf ("(0)     Print date\n");
     printf ("(1)     Print day\n");
     printf ("(2)     Print month\n");
@@ -100,7 +117,8 @@ $def
     printf ("(6)     Set year\n");
     printf ("(7)     Print binary\n");
     printf ("(other) Exit.\n"); 
-$fmg
+    
+    $fmg
     // Main cycle
     while (running)
     {
@@ -154,17 +172,21 @@ $fmg
             break;
             
         default:            // Exit if other command
-$fyl        printf ("Bye!\n");
+        
+            $fyl
+            printf ("Bye!\n");
             running = 0;
             break;
         }
-
     }
-$def
+    
+    $fyl
     return 0;
 }
 
-// ===============================================================================
+//===============================================================================================================
+// Function definitions
+//===============================================================================================================
 
 unsigned short date_to_compact (unsigned int day, unsigned int month, unsigned int year)
 {
@@ -184,7 +206,7 @@ unsigned short date_to_compact (unsigned int day, unsigned int month, unsigned i
     return compact;
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void compact_to_date (unsigned short date, unsigned int * day, unsigned int * month, unsigned int * year)
 {
@@ -194,7 +216,7 @@ void compact_to_date (unsigned short date, unsigned int * day, unsigned int * mo
     *year  = (date & year_mask_c) >> 9; 
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void print_binary (unsigned short date)
 {
@@ -211,7 +233,7 @@ void print_binary (unsigned short date)
     }
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 unsigned short set_day (unsigned short date)
 {
@@ -230,7 +252,7 @@ unsigned short set_day (unsigned short date)
     return (date & ~day_mask_c) | (unsigned short) day;
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 unsigned short set_month (unsigned short date)
 {
@@ -249,7 +271,7 @@ unsigned short set_month (unsigned short date)
     return (date & ~month_mask_c) | (unsigned short) (month << 5);
 } 
 
-// ===============================================================================
+//===============================================================================================================
 
 unsigned short set_year (unsigned short date)
 {
@@ -269,21 +291,21 @@ unsigned short set_year (unsigned short date)
     return (date & ~year_mask_c) | (unsigned short) (year << 9);
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void print_day (unsigned short date)
 {
     printf ("Day: %u\n", date & day_mask_c);
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void print_month (unsigned short date)
 {
     printf ("Month: %u\n", (date & month_mask_c) >> 5);
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void print_year (unsigned short date)
 {
@@ -292,7 +314,7 @@ void print_year (unsigned short date)
     printf ("Year: %u\n", year > 49 ? 1900 + year : 2000 + year);
 }
 
-// ===============================================================================
+//===============================================================================================================
 
 void flush_input ()
 {
@@ -300,5 +322,3 @@ void flush_input ()
 
     while ((c = getchar()) != '\n' && c != EOF);
 }
-
-// ===============================================================================
