@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Colors library include
+// Terminal colors library include
 #include "colors.h"
 
 //===============================================================================================================
@@ -73,30 +73,31 @@ int main ()
     // Asking to enter coefficients until they are correct
     while (1)
     {
-        $fmg
-        printf ("Enter date (DD MM YY): "); 
-        
-        if ((scanf_output = scanf ("%u %u %u", &day, &month, &year)) != 3 || day > 31 || month > 12 || year > 99)
-        {
-            CHECK_EOF(scanf_output);
+        set_tmcolor (TM_COLOR_MAGENTA);
+        printf ("Enter date (DD MM YY): ");
 
-            $fyl
+        set_tmcolor (TM_COLOR_WHITE);
+        scanf_output = scanf ("%u %u %u", &day, &month, &year);
+        CHECK_EOF(scanf_output);
+
+        if (scanf_output != 3 || day > 31 || month > 12 || year > 99)
+        {
+            set_tmcolor (TM_COLOR_YELLOW);
             printf ("Sorry, incorrect date. Try again.\n\n");
             
             flush_input ();  // Clear input and try again
             continue;
         }
-        
 
         compact = date_to_compact (day, month, year); // If input is correct, pack date to compact container
         break;
     }
 
     // Print list of commands
-    $fbl
+    set_tmcolor (TM_COLOR_BLUE);
     printf ("\nList of commands:\n\n");
     
-    $def
+    set_tmcolor (TM_COLOR_WHITE);
     printf ("(0)     Print date\n");
     printf ("(1)     Print day\n");
     printf ("(2)     Print month\n");
@@ -107,13 +108,16 @@ int main ()
     printf ("(7)     Print binary\n");
     printf ("(other) Exit.\n"); 
     
-    $fmg
+    set_tmcolor (TM_COLOR_CYAN);
     // Main cycle
     while (running)
     {
         char input = ' ';                           // User input character
 
+        set_tmcolor (TM_COLOR_MAGENTA);
         printf ("\nEnter command: ");        // Command input
+
+        set_tmcolor (TM_COLOR_WHITE);
         scanf_output = scanf (" %c", &input);
 
         CHECK_EOF (scanf_output);
@@ -123,6 +127,7 @@ int main ()
         {
         case PRINT_DATE_CMD:  // Print date
             compact_to_date (compact, &day, &month, &year);
+            set_tmcolor (TM_COLOR_CYAN);
             printf ("Current date: %u/%u/%u\n", day, month, year);
             break;
 
@@ -140,21 +145,25 @@ int main ()
 
         case SET_DAY_CMD:     // Set day
             compact = set_day (compact);
+            $fgr
             printf ("Success!\n");
             break;
 
         case SET_MONTH_CMD:   // Set month
             compact = set_month (compact);
+            $fgr
             printf ("Success!\n");
 
             break;
 
         case SET_YEAR_CMD:    // Set year
             compact = set_year (compact);
+            $fgr
             printf ("Success!\n");
             break;
 
         case PRINT_BINARY_CMD: // Print compact container in binary representation
+            set_tmcolor (TM_COLOR_CYAN);
             printf ("Stored date in binary: \n");
             print_binary (compact);
             printf ("\n");
@@ -162,14 +171,14 @@ int main ()
             
         default:            // Exit if other command
         
-            $fyl
+            set_tmcolor (TM_COLOR_YELLOW);
             printf ("Bye!\n");
             running = 0;
             break;
         }
     }
     
-    $fyl
+    $def
     return 0;
 }
 
@@ -228,16 +237,26 @@ unsigned short set_day (unsigned short date)
 {
     // Day value
     unsigned int day = 0;
-    int scanf_output = 0;
-    
+
+    set_tmcolor (TM_COLOR_MAGENTA);
     printf ("Enter day: ");
-    while ((scanf_output = scanf ("%u", &day)) != 1 || day > 31)
+
+    set_tmcolor (TM_COLOR_WHITE);
+    while (1)
     {
+        int scanf_output = scanf ("%u", &day);
         CHECK_EOF (scanf_output);
+
+        if (scanf_output == 1 && day <= 31)
+            break;
+
+        set_tmcolor (TM_COLOR_YELLOW);
         printf ("Incorrect day format, try again: ");
+
         flush_input(); // Try again
+        set_tmcolor (TM_COLOR_WHITE);
     }
-    
+
     return (date & ~day_mask_c) | (unsigned short) day;
 }
 
@@ -247,14 +266,23 @@ unsigned short set_month (unsigned short date)
 {
     // Month value
     unsigned int month = 0;
-    int scanf_output = 0;
 
+    set_tmcolor (TM_COLOR_MAGENTA);
     printf ("Enter month: ");
-    while (scanf_output = (scanf ("%u", &month)) != 1 || month > 12)
+
+    set_tmcolor (TM_COLOR_WHITE);
+    while (1)
     {
+        int scanf_output = scanf ("%u", &month);
         CHECK_EOF (scanf_output);
+
+        if (scanf_output == 1 && month <= 12)
+            break;
+
+        set_tmcolor (TM_COLOR_YELLOW);
         printf ("Incorrect month format, try again: ");
         flush_input(); // Try again
+        set_tmcolor (TM_COLOR_WHITE);
     }
 
     return (date & ~month_mask_c) | (unsigned short) (month << 5);
@@ -266,15 +294,23 @@ unsigned short set_year (unsigned short date)
 {
     // Year value
     unsigned int year = 0;
-    int scanf_output = 0;
 
+    set_tmcolor (TM_COLOR_MAGENTA);
     printf ("Enter year: ");
-    while (scanf_output = (scanf ("%u", &year)) != 1 || year > 99)
+
+    set_tmcolor (TM_COLOR_WHITE);
+    while (1)
     {
+        int scanf_output = scanf ("%u", &year);
         CHECK_EOF (scanf_output);
 
+        if (scanf_output == 1 && year < 100)
+            break;
+
+        set_tmcolor (TM_COLOR_YELLOW);
         printf ("Incorrect year format, try again: ");
         flush_input (); // Try again
+        set_tmcolor (TM_COLOR_WHITE);
     }
 
     return (date & ~year_mask_c) | (unsigned short) (year << 9);
@@ -284,6 +320,7 @@ unsigned short set_year (unsigned short date)
 
 void print_day (unsigned short date)
 {
+    set_tmcolor (TM_COLOR_CYAN);
     printf ("Day: %u\n", date & day_mask_c);
 }
 
@@ -291,6 +328,7 @@ void print_day (unsigned short date)
 
 void print_month (unsigned short date)
 {
+    set_tmcolor (TM_COLOR_CYAN);
     printf ("Month: %u\n", (date & month_mask_c) >> 5);
 }
 
@@ -300,6 +338,7 @@ void print_year (unsigned short date)
 {
     int year = (date & year_mask_c) >> 9;
 
+    set_tmcolor (TM_COLOR_CYAN);
     printf ("Year: %u\n", year > 49 ? 1900 + year : 2000 + year);
 }
 
