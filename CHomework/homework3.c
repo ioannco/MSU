@@ -5,6 +5,7 @@
 // STD
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // My libs
 #include "colors.h"
@@ -36,6 +37,8 @@ int comp (const char * left, const char * right);
 int main (int argc, char ** argv)
 {
     unsigned int i = 0;
+
+    srand (time(NULL));
 
     for (i = 0; i < 1000; i++)
     {
