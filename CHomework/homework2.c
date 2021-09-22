@@ -59,6 +59,10 @@ void           print_year      (unsigned short date);
 // Flush the console buffer
 void           flush_input     ();
 
+// Function that checks the date
+int            check_date              (unsigned int day, unsigned int month, unsigned int year);
+int            check_compact_date      (unsigned short date);
+
 //===============================================================================================================
 // Main
 //===============================================================================================================
@@ -80,7 +84,7 @@ int main ()
         scanf_output = scanf ("%u %u %u", &day, &month, &year);
         CHECK_EOF(scanf_output);
 
-        if (scanf_output != 3 || day > 31 || month > 12 || year > 99)
+        if (scanf_output != 3 || !check_date(day, month, year))
         {
             set_tmcolor (TM_COLOR_YELLOW);
             printf ("Sorry, incorrect date. Try again.\n\n");
@@ -244,10 +248,12 @@ unsigned short set_day (unsigned short date)
     set_tmcolor (TM_COLOR_WHITE);
     while (1)
     {
+        unsigned int month, year;
+        compact_to_date (date, &day, &month, &year);
         int scanf_output = scanf ("%u", &day);
         CHECK_EOF (scanf_output);
 
-        if (scanf_output == 1 && day <= 31)
+        if (scanf_output == 1 && check_date (day, month, year))
             break;
 
         set_tmcolor (TM_COLOR_YELLOW);
@@ -273,10 +279,13 @@ unsigned short set_month (unsigned short date)
     set_tmcolor (TM_COLOR_WHITE);
     while (1)
     {
+        unsigned int day, year;
+        compact_to_date (date, &day, &month, &year);
+
         int scanf_output = scanf ("%u", &month);
         CHECK_EOF (scanf_output);
 
-        if (scanf_output == 1 && month <= 12)
+        if (scanf_output == 1 && check_date (day, month, year))
             break;
 
         set_tmcolor (TM_COLOR_YELLOW);
@@ -301,10 +310,13 @@ unsigned short set_year (unsigned short date)
     set_tmcolor (TM_COLOR_WHITE);
     while (1)
     {
+        unsigned int day, month;
+        compact_to_date (date, &day, &month, &year);
+
         int scanf_output = scanf ("%u", &year);
         CHECK_EOF (scanf_output);
 
-        if (scanf_output == 1 && year < 100)
+        if (scanf_output == 1 && check_date (day, month, year))
             break;
 
         set_tmcolor (TM_COLOR_YELLOW);
@@ -350,3 +362,47 @@ void flush_input ()
 
     while ((c = getchar()) != '\n' && c != EOF);
 }
+
+//===============================================================================================================
+
+int check_date (unsigned int day, unsigned int month, unsigned int year)
+{
+    if (!month || !day || year > 99)
+        return 0;
+
+    if (month == 2)
+    {
+        if (year % 4)
+            return day < 29;
+
+        return day < 30;
+    }
+
+    if (month < 8)
+    {
+        if (month % 2)
+            return day < 31;
+
+        return day < 32;
+    }
+
+    if (month < 13)
+    {
+        if (month % 2)
+            return day < 32;
+
+        return day < 31;
+    }
+
+    return 0;
+}
+
+//===============================================================================================================
+
+int check_date_compact (unsigned short date)
+{
+    unsigned int day, month, year;
+
+    compact_to_date (date, &day, &month, &year);
+    return check_date (day, month, year);
+};
