@@ -58,7 +58,7 @@ char * get_string ();
 // Separate string function
 void process_string (char * string, char separator, char *** string_array, unsigned int * string_array_size);
 
-// Count lenght of string
+// Count length of string
 int my_strlen (const char * string);
 
 // Delete strings shorter than N
@@ -105,17 +105,58 @@ int main (int argc, char ** argv)
             }
         }
 
-    }
+        printf ("Enter string: ");
+        string = get_string();
 
-    printf ("Enter string: ");
-    string = get_string();
+        process_string (string, separator, &string_array, &string_array_size);
+
+        switch (command)
+        {
+            case 1:
+                my_qsort (string_array, string_array_size, sizeof (char *),
+                          (int (*) (const void *, const void *)) my_strcmp);
+                break;
+
+            case 2:
+                my_qsort (string_array, string_array_size, sizeof (char *),
+                          (int (*) (const void *, const void *)) my_strcmp_r);
+                break;
+
+            case 3:
+                delete_shorter (&string_array, &string_array_size, N);
+                break;
+
+            default:
+                break;
+        }
+
+
+        printf ("\n");
+
+        for (i = 0; i < string_array_size; i++)
+        {
+            printf ("%s\n", string_array[i]);
+        }
+
+        printf ("\n");
+
+        for (i = 0; i < string_array_size; i++)
+            free (string_array[i]);
+        free (string_array);
+
+    }
+    else
+    {
+        printf ("Enter string: ");
+        string = get_string();
+    }
 
     while (1)
     {
         while (1)
         {
             int scanf_output = 0;
-            printf ("Enter separator character: ");
+            printf ("Enter separator character (q for exit): ");
 
             scanf_output = scanf ("%c", &separator);
 
