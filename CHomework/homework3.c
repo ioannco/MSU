@@ -70,9 +70,9 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
 
 int main (int argc, char ** argv)
 {
-    char separator = ' ';                   // string separator
+    char separator = 0;                   // string separator
     int command = -1;                       // user command
-    char * string = "";                     // string we need to process
+    char * string = NULL;                   // string we need to process
     int N = -1;                             // delete count
     char ** string_array = NULL;            // string array
     unsigned int string_array_size = 0;     // string array size
