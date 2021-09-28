@@ -1,13 +1,8 @@
 var searchData=
 [
-  ['terminal_5fcolors',['terminal_colors',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55',1,'colors.h']]],
-  ['terminal_5freset',['TERMINAL_RESET',['../colors_8h.html#a800436ff5ab02aab2072bdd6b0b85089',1,'colors.h']]],
-  ['tm_5fcolor_5fblack',['TM_COLOR_BLACK',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55aa678a11cc9bb9ace6de5caba5f280da9',1,'colors.h']]],
-  ['tm_5fcolor_5fblue',['TM_COLOR_BLUE',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a3bed76401fac27a14bdde1eef164b1c9',1,'colors.h']]],
-  ['tm_5fcolor_5fcyan',['TM_COLOR_CYAN',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a4872e132e8df8c1ed89ccf95ccff86de',1,'colors.h']]],
-  ['tm_5fcolor_5fgreen',['TM_COLOR_GREEN',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a0460ae70b63801b1368f65b1b2708fcb',1,'colors.h']]],
-  ['tm_5fcolor_5fmagenta',['TM_COLOR_MAGENTA',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55ab186bbea8084b0adf1707a1209c5bce2',1,'colors.h']]],
-  ['tm_5fcolor_5fred',['TM_COLOR_RED',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a58bc62461ba2cafd710bfb159d980ae8',1,'colors.h']]],
-  ['tm_5fcolor_5fwhite',['TM_COLOR_WHITE',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a31f55fb1881eeedcde5a86140597df4b',1,'colors.h']]],
-  ['tm_5fcolor_5fyellow',['TM_COLOR_YELLOW',['../colors_8h.html#a9e2c204c82f24fae88ca3aafb3b58a55a2e00c733347b2a7789e2728b0aeff69f',1,'colors.h']]]
+  ['has_5f3',['has_3',['../lesson3_8c.html#aa3e2ef87053c8f46cc729fa5f1cc539b',1,'lesson3.c']]],
+  ['hex',['HEX',['../_c_homework_2cmake-build-debug_2_c_make_files_23_820_82_2_compiler_id_c_2_c_make_c_compiler_id_8c.html#a46d5d95daa1bef867bd0179594310ed5',1,'HEX():&#160;CMakeCCompilerId.c'],['../_c_lessons_2cmake-build-debug_2_c_make_files_23_820_82_2_compiler_id_c_2_c_make_c_compiler_id_8c.html#a46d5d95daa1bef867bd0179594310ed5',1,'HEX():&#160;CMakeCCompilerId.c'],['../cmake-build-debug_2_c_make_files_23_820_82_2_compiler_id_c_2_c_make_c_compiler_id_8c.html#a46d5d95daa1bef867bd0179594310ed5',1,'HEX():&#160;CMakeCCompilerId.c']]],
+  ['homework1_2ec',['homework1.c',['../homework1_8c.html',1,'']]],
+  ['homework2_2ec',['homework2.c',['../homework2_8c.html',1,'']]],
+  ['homework3_2ec',['homework3.c',['../homework3_8c.html',1,'']]]
 ];
