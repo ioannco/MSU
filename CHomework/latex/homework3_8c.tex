@@ -1,0 +1,409 @@
+\hypertarget{homework3_8c}{}\section{homework3.\+c File Reference}
+\label{homework3_8c}\index{homework3.\+c@{homework3.\+c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include $<$memory.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}colors.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{homework3_8c_a5f91facce422fa3ce1e03509d08eb99b}{my\+\_\+qsort} (void $\ast$array, unsigned int size, unsigned int member\+\_\+size, int($\ast$compare\+\_\+func)(const void $\ast$, const void $\ast$))
+\begin{DoxyCompactList}\small\item\em Start of the quicksort algorithm. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_a19a69c9b42353d0348e7b07014c6e321}{qsort\+\_\+r} (void $\ast$array, unsigned int left, unsigned int right, unsigned int member\+\_\+size, int($\ast$compare\+\_\+func)(const void $\ast$, const void $\ast$))
+\begin{DoxyCompactList}\small\item\em Recursive part of quicksort algorithm. \end{DoxyCompactList}\item 
+unsigned int \hyperlink{homework3_8c_af9ccd83e480a736e8f9b8b393c8dca52}{partition} (void $\ast$array, unsigned int left, unsigned int right, unsigned int member\+\_\+size, int($\ast$compare\+\_\+func)(const void $\ast$, const void $\ast$))
+\begin{DoxyCompactList}\small\item\em Partition of the array. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_aaea6b879a5b0f7a6aae00fd7c56fd1ed}{swap} (void $\ast$a, void $\ast$b, unsigned int member\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Swap function. \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a61beba9600c903c736b92d90371e15ca}{sort\+\_\+unit\+\_\+test} (unsigned int array\+\_\+length)
+\begin{DoxyCompactList}\small\item\em Unit tests for my quick sort. \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a4fcce503f15a60a42f576e8ab66ab2d0}{comp\+\_\+char\+\_\+low\+\_\+high} (const char $\ast$left, const char $\ast$right)
+\begin{DoxyCompactList}\small\item\em Compare function for chars (from lower to higher) \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_af2a4a2cdda6d8e6b4035b268f313861f}{comp\+\_\+char\+\_\+high\+\_\+low} (const char $\ast$left, const char $\ast$right)
+\begin{DoxyCompactList}\small\item\em Compare function for chars (from higher to lower) \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_ad455c51006f7c277ce598a20796fb50c}{my\+\_\+strcmp} (const char $\ast$$\ast$str1, const char $\ast$$\ast$str2)
+\begin{DoxyCompactList}\small\item\em Compare function for strings (from lower to higher) \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a0cd76bf75211ef27d2fa35e7cb035cc4}{my\+\_\+strcmp\+\_\+r} (const char $\ast$$\ast$str1, const char $\ast$$\ast$str2)
+\begin{DoxyCompactList}\small\item\em Compare function for strings (from higher to lower) \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a3880347f4b4ab1a0c7ff1f540cf4e4b3}{run\+\_\+tests} (unsigned int tests\+\_\+count)
+\begin{DoxyCompactList}\small\item\em Unit tests runner. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_a524aa8b7fca0121ce0f1c09aebc70328}{flush\+\_\+buffer} ()
+\begin{DoxyCompactList}\small\item\em Console buffer flush function. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_a813feb368316ccaeebb99b03584e3f5f}{R\+O\+L} (char $\ast$$\ast$array, unsigned int start, unsigned int end)
+\begin{DoxyCompactList}\small\item\em Cyclic shift to the left. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{homework3_8c_ae7af89a89855caad787128aaa60b7c04}{get\+\_\+string} ()
+\begin{DoxyCompactList}\small\item\em Get string from input. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_a69009626e78cdb8e6ecfd9d6b2ce8158}{process\+\_\+string} (char $\ast$string, char separator, char $\ast$$\ast$$\ast$string\+\_\+array, unsigned int $\ast$string\+\_\+array\+\_\+size)
+\begin{DoxyCompactList}\small\item\em Separate string function. \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a730432858da1de7cd8f3f19848fd773e}{my\+\_\+strlen} (const char $\ast$string)
+\begin{DoxyCompactList}\small\item\em Count length of string. \end{DoxyCompactList}\item 
+void \hyperlink{homework3_8c_aa9293b86ac77ffb4a2b186cb387db85d}{delete\+\_\+shorter} (char $\ast$$\ast$$\ast$string\+\_\+array, unsigned int $\ast$array\+\_\+size, unsigned int N)
+\begin{DoxyCompactList}\small\item\em Delete strings shorter than N. \end{DoxyCompactList}\item 
+int \hyperlink{homework3_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{homework3_8c_af2a4a2cdda6d8e6b4035b268f313861f}{}\index{homework3.\+c@{homework3.\+c}!comp\+\_\+char\+\_\+high\+\_\+low@{comp\+\_\+char\+\_\+high\+\_\+low}}
+\index{comp\+\_\+char\+\_\+high\+\_\+low@{comp\+\_\+char\+\_\+high\+\_\+low}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{comp\+\_\+char\+\_\+high\+\_\+low}]{\setlength{\rightskip}{0pt plus 5cm}int comp\+\_\+char\+\_\+high\+\_\+low (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{left, }
+\item[{const char $\ast$}]{right}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_af2a4a2cdda6d8e6b4035b268f313861f}
+
+
+Compare function for chars (from higher to lower) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em left} & first element \\
+\hline
+{\em right} & second element \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of the comparison 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_a4fcce503f15a60a42f576e8ab66ab2d0}{}\index{homework3.\+c@{homework3.\+c}!comp\+\_\+char\+\_\+low\+\_\+high@{comp\+\_\+char\+\_\+low\+\_\+high}}
+\index{comp\+\_\+char\+\_\+low\+\_\+high@{comp\+\_\+char\+\_\+low\+\_\+high}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{comp\+\_\+char\+\_\+low\+\_\+high}]{\setlength{\rightskip}{0pt plus 5cm}int comp\+\_\+char\+\_\+low\+\_\+high (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{left, }
+\item[{const char $\ast$}]{right}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a4fcce503f15a60a42f576e8ab66ab2d0}
+
+
+Compare function for chars (from lower to higher) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em left} & first element \\
+\hline
+{\em right} & second element \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of the comparison 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_aa9293b86ac77ffb4a2b186cb387db85d}{}\index{homework3.\+c@{homework3.\+c}!delete\+\_\+shorter@{delete\+\_\+shorter}}
+\index{delete\+\_\+shorter@{delete\+\_\+shorter}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{delete\+\_\+shorter}]{\setlength{\rightskip}{0pt plus 5cm}void delete\+\_\+shorter (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$$\ast$}]{string\+\_\+array, }
+\item[{unsigned int $\ast$}]{array\+\_\+size, }
+\item[{unsigned int}]{N}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_aa9293b86ac77ffb4a2b186cb387db85d}
+
+
+Delete strings shorter than N. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em string\+\_\+array} & pointer to the string array \\
+\hline
+{\em array\+\_\+size} & string array size \\
+\hline
+{\em N} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{homework3_8c_a524aa8b7fca0121ce0f1c09aebc70328}{}\index{homework3.\+c@{homework3.\+c}!flush\+\_\+buffer@{flush\+\_\+buffer}}
+\index{flush\+\_\+buffer@{flush\+\_\+buffer}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{flush\+\_\+buffer}]{\setlength{\rightskip}{0pt plus 5cm}void flush\+\_\+buffer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a524aa8b7fca0121ce0f1c09aebc70328}
+
+
+Console buffer flush function. 
+
+\hypertarget{homework3_8c_ae7af89a89855caad787128aaa60b7c04}{}\index{homework3.\+c@{homework3.\+c}!get\+\_\+string@{get\+\_\+string}}
+\index{get\+\_\+string@{get\+\_\+string}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{get\+\_\+string}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ get\+\_\+string (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_ae7af89a89855caad787128aaa60b7c04}
+
+
+Get string from input. 
+
+Please, release memory of the returned pointer
+
+\begin{DoxyReturn}{Returns}
+pointer to the string 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_a3c04138a5bfe5d72780bb7e82a18e627}{}\index{homework3.\+c@{homework3.\+c}!main@{main}}
+\index{main@{main}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a3c04138a5bfe5d72780bb7e82a18e627}
+\hypertarget{homework3_8c_a5f91facce422fa3ce1e03509d08eb99b}{}\index{homework3.\+c@{homework3.\+c}!my\+\_\+qsort@{my\+\_\+qsort}}
+\index{my\+\_\+qsort@{my\+\_\+qsort}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{my\+\_\+qsort}]{\setlength{\rightskip}{0pt plus 5cm}void my\+\_\+qsort (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{array, }
+\item[{unsigned int}]{size, }
+\item[{unsigned int}]{member\+\_\+size, }
+\item[{int($\ast$)(const void $\ast$, const void $\ast$)}]{compare\+\_\+func}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a5f91facce422fa3ce1e03509d08eb99b}
+
+
+Start of the quicksort algorithm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array} & array to sort \\
+\hline
+{\em size} & size of the array \\
+\hline
+{\em member\+\_\+size} & size of array member \\
+\hline
+{\em compare\+\_\+func} & pointer to function that compares two members of array \\
+\hline
+\end{DoxyParams}
+\hypertarget{homework3_8c_ad455c51006f7c277ce598a20796fb50c}{}\index{homework3.\+c@{homework3.\+c}!my\+\_\+strcmp@{my\+\_\+strcmp}}
+\index{my\+\_\+strcmp@{my\+\_\+strcmp}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{my\+\_\+strcmp}]{\setlength{\rightskip}{0pt plus 5cm}int my\+\_\+strcmp (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$$\ast$}]{str1, }
+\item[{const char $\ast$$\ast$}]{str2}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_ad455c51006f7c277ce598a20796fb50c}
+
+
+Compare function for strings (from lower to higher) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em left} & first element \\
+\hline
+{\em right} & second element \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of the comparison 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_a0cd76bf75211ef27d2fa35e7cb035cc4}{}\index{homework3.\+c@{homework3.\+c}!my\+\_\+strcmp\+\_\+r@{my\+\_\+strcmp\+\_\+r}}
+\index{my\+\_\+strcmp\+\_\+r@{my\+\_\+strcmp\+\_\+r}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{my\+\_\+strcmp\+\_\+r}]{\setlength{\rightskip}{0pt plus 5cm}int my\+\_\+strcmp\+\_\+r (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$$\ast$}]{str1, }
+\item[{const char $\ast$$\ast$}]{str2}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a0cd76bf75211ef27d2fa35e7cb035cc4}
+
+
+Compare function for strings (from higher to lower) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em left} & first element \\
+\hline
+{\em right} & second element \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of the comparison 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_a730432858da1de7cd8f3f19848fd773e}{}\index{homework3.\+c@{homework3.\+c}!my\+\_\+strlen@{my\+\_\+strlen}}
+\index{my\+\_\+strlen@{my\+\_\+strlen}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{my\+\_\+strlen}]{\setlength{\rightskip}{0pt plus 5cm}int my\+\_\+strlen (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{string}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a730432858da1de7cd8f3f19848fd773e}
+
+
+Count length of string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+elements count 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_af9ccd83e480a736e8f9b8b393c8dca52}{}\index{homework3.\+c@{homework3.\+c}!partition@{partition}}
+\index{partition@{partition}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{partition}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int partition (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{array, }
+\item[{unsigned int}]{left, }
+\item[{unsigned int}]{right, }
+\item[{unsigned int}]{member\+\_\+size, }
+\item[{int($\ast$)(const void $\ast$, const void $\ast$)}]{compare\+\_\+func}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_af9ccd83e480a736e8f9b8b393c8dca52}
+
+
+Partition of the array. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array} & array to part \\
+\hline
+{\em left} & index to left bound of sort area \\
+\hline
+{\em right} & index to right bound of sort area \\
+\hline
+{\em member\+\_\+size} & size of array member \\
+\hline
+{\em compare\+\_\+func} & pointer to function that compares two members of array \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+index of the separator 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{homework3_8c_a5f91facce422fa3ce1e03509d08eb99b}{my\+\_\+qsort} (void $\ast$ array, unsigned int size, unsigned int member\+\_\+size, int ($\ast$compare\+\_\+func) (const void $\ast$, const void $\ast$)) 
+\end{DoxySeeAlso}
+\hypertarget{homework3_8c_a69009626e78cdb8e6ecfd9d6b2ce8158}{}\index{homework3.\+c@{homework3.\+c}!process\+\_\+string@{process\+\_\+string}}
+\index{process\+\_\+string@{process\+\_\+string}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{process\+\_\+string}]{\setlength{\rightskip}{0pt plus 5cm}void process\+\_\+string (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{string, }
+\item[{char}]{separator, }
+\item[{char $\ast$$\ast$$\ast$}]{string\+\_\+array, }
+\item[{unsigned int $\ast$}]{string\+\_\+array\+\_\+size}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a69009626e78cdb8e6ecfd9d6b2ce8158}
+
+
+Separate string function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em string} & \\
+\hline
+{\em separator} & \\
+\hline
+{\em string\+\_\+array} & \\
+\hline
+{\em string\+\_\+array\+\_\+size} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{homework3_8c_a19a69c9b42353d0348e7b07014c6e321}{}\index{homework3.\+c@{homework3.\+c}!qsort\+\_\+r@{qsort\+\_\+r}}
+\index{qsort\+\_\+r@{qsort\+\_\+r}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{qsort\+\_\+r}]{\setlength{\rightskip}{0pt plus 5cm}void qsort\+\_\+r (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{array, }
+\item[{unsigned int}]{left, }
+\item[{unsigned int}]{right, }
+\item[{unsigned int}]{member\+\_\+size, }
+\item[{int($\ast$)(const void $\ast$, const void $\ast$)}]{compare\+\_\+func}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a19a69c9b42353d0348e7b07014c6e321}
+
+
+Recursive part of quicksort algorithm. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array} & array to sort \\
+\hline
+{\em left} & index to left bound of sort area \\
+\hline
+{\em right} & index to right bound of sort area \\
+\hline
+{\em member\+\_\+size} & size of array member \\
+\hline
+{\em compare\+\_\+func} & pointer to function that compares two members of array\\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{homework3_8c_a5f91facce422fa3ce1e03509d08eb99b}{my\+\_\+qsort} (void $\ast$ array, unsigned int size, unsigned int member\+\_\+size, int ($\ast$compare\+\_\+func) (const void $\ast$, const void $\ast$)) 
+\end{DoxySeeAlso}
+\hypertarget{homework3_8c_a813feb368316ccaeebb99b03584e3f5f}{}\index{homework3.\+c@{homework3.\+c}!R\+O\+L@{R\+O\+L}}
+\index{R\+O\+L@{R\+O\+L}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{R\+O\+L}]{\setlength{\rightskip}{0pt plus 5cm}void R\+O\+L (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$}]{array, }
+\item[{unsigned int}]{start, }
+\item[{unsigned int}]{end}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a813feb368316ccaeebb99b03584e3f5f}
+
+
+Cyclic shift to the left. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array} & array to shift \\
+\hline
+{\em start} & start of the shift area \\
+\hline
+{\em end} & nd of the shift area \\
+\hline
+\end{DoxyParams}
+\hypertarget{homework3_8c_a3880347f4b4ab1a0c7ff1f540cf4e4b3}{}\index{homework3.\+c@{homework3.\+c}!run\+\_\+tests@{run\+\_\+tests}}
+\index{run\+\_\+tests@{run\+\_\+tests}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{run\+\_\+tests}]{\setlength{\rightskip}{0pt plus 5cm}int run\+\_\+tests (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{tests\+\_\+count}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a3880347f4b4ab1a0c7ff1f540cf4e4b3}
+
+
+Unit tests runner. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tests\+\_\+count} & Number of tests \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Success or not 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_a61beba9600c903c736b92d90371e15ca}{}\index{homework3.\+c@{homework3.\+c}!sort\+\_\+unit\+\_\+test@{sort\+\_\+unit\+\_\+test}}
+\index{sort\+\_\+unit\+\_\+test@{sort\+\_\+unit\+\_\+test}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{sort\+\_\+unit\+\_\+test}]{\setlength{\rightskip}{0pt plus 5cm}int sort\+\_\+unit\+\_\+test (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{array\+\_\+length}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_a61beba9600c903c736b92d90371e15ca}
+
+
+Unit tests for my quick sort. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em array\+\_\+length} & length of the array you want to test \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if success and 0 if not 
+\end{DoxyReturn}
+\hypertarget{homework3_8c_aaea6b879a5b0f7a6aae00fd7c56fd1ed}{}\index{homework3.\+c@{homework3.\+c}!swap@{swap}}
+\index{swap@{swap}!homework3.\+c@{homework3.\+c}}
+\subsubsection[{swap}]{\setlength{\rightskip}{0pt plus 5cm}void swap (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{a, }
+\item[{void $\ast$}]{b, }
+\item[{unsigned int}]{member\+\_\+size}
+\end{DoxyParamCaption}
+)}\label{homework3_8c_aaea6b879a5b0f7a6aae00fd7c56fd1ed}
+
+
+Swap function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & pointer to the first element \\
+\hline
+{\em b} & pointer to the second second element \\
+\hline
+{\em member\+\_\+size} & size of elements \\
+\hline
+\end{DoxyParams}

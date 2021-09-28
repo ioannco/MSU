@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 int main1 ()
 {
     int k;
@@ -14,12 +17,16 @@ int main1 ()
 
 int main ()
 {
-    int x = 1, y = 2, z;
+    short pack = (short) rand();
+    short day = 13;
 
-    z = x&y | (x && y);
+    printf ("pack = 0x%X\n", pack);
+    printf ("day = %d = 0x%X\n", day, day);
 
-    // z = 1
-   
+    pack = pack & 0x07FF | (day << 11);
+
+    printf ("pack with day = 0x%X\n", pack);
+
     return 0; 
 }
 

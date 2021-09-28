@@ -16,52 +16,153 @@
 // Function declarations
 //===============================================================================================================
 
-// Start of quicksort algorithm
+/**
+ * @brief Start of the quicksort algorithm
+ *
+ * @param array         array to sort
+ * @param size          size of the array
+ * @param member_size   size of array member
+ * @param compare_func  pointer to function that compares two members of array
+ */
 void my_qsort (void * array, unsigned int size, unsigned int member_size, int (*compare_func) (const void *, const void *));
 
-// Recursive part of quicksort algorithm
+/**
+ * @brief Recursive part of quicksort algorithm
+ *
+ * @param array         array to sort
+ * @param left          index to left bound of sort area
+ * @param right         index to right bound of sort area
+ * @param member_size   size of array member
+ * @param compare_func  pointer to function that compares two members of array
+ *
+ * @see my_qsort (void * array, unsigned int size, unsigned int member_size, int (*compare_func) (const void *, const void *))
+ */
 void qsort_r    (void * array, unsigned int left, unsigned int right, unsigned int member_size, int (*compare_func) (const void *, const void *));
 
-// Partition of the array
+/**
+ * @brief Partition of the array
+ *
+ * @param array         array to part
+ * @param left          index to left bound of sort area
+ * @param right         index to right bound of sort area
+ * @param member_size   size of array member
+ * @param compare_func  pointer to function that compares two members of array
+ * @return              index of the separator
+ * @see                 my_qsort (void * array, unsigned int size, unsigned int member_size, int (*compare_func) (const void *, const void *))
+ */
 unsigned int  partition  (void * array, unsigned int left, unsigned int right, unsigned int member_size, int (*compare_func) (const void *, const void *));
 
-// Swap function
+/**
+ * @brief Swap function
+ *
+ * @param a             pointer to the first element
+ * @param b             pointer to the second second element
+ * @param member_size   size of elements
+ */
 void swap (void * a, void * b, unsigned int member_size);
 
-// Unit tests for my quick sort
+/**
+ * @brief Unit tests for my quick sort
+ *
+ * @param array_length  length of the array you want to test
+ * @return              1 if success and 0 if not
+ */
 int sort_unit_test (unsigned int array_length);
 
-// Compare function for chars (from lower to higher)
+/**
+ * @brief Compare function for chars (from lower to higher)
+ *
+ * @param left  first element
+ * @param right second element
+ * @return      result of the comparison
+ */
 int comp_char_low_high (const char * left, const char * right);
 
-// Compare function for chars (from lower to higher)
+/**
+ * @brief Compare function for chars (from higher to lower)
+ *
+ * @param left  first element
+ * @param right second element
+ * @return      result of the comparison
+ */
 int comp_char_high_low (const char * left, const char * right);
 
-// Compare function for strings (from lower to higher)
+/**
+ * @brief Compare function for strings (from lower to higher)
+ *
+ * @param left  first element
+ * @param right second element
+ * @return      result of the comparison
+ */
 int my_strcmp (const char ** str1, const char ** str2);
 
-// Compare function for strings (from lower to higher)
+/**
+ * @brief Compare function for strings (from higher to lower)
+ *
+ * @param left  first element
+ * @param right second element
+ * @return      result of the comparison
+ */
 int my_strcmp_r (const char ** str1, const char ** str2);
 
-// Unit tests runner
+//
+/**
+ * @brief Unit tests runner
+ *
+ * @param tests_count   Number of tests
+ * @return              Success or not
+ */
 int run_tests (unsigned int tests_count);
 
-// Console buffer flush function
+/**
+ * @brief Console buffer flush function
+ */
 void flush_buffer ();
 
-// Cyclic shift to the left
+/**
+ * @brief Cyclic shift to the left
+ *
+ * @param array     array to shift
+ * @param start     start of the shift area
+ * @param end       nd of the shift area
+ */
 void ROL (char ** array, unsigned int start, unsigned int end);
 
-// Get string from input
+//
+/**
+ * @brief Get string from input.
+ *
+ * Please, release memory of the returned pointer
+ *
+ * @return pointer to the string
+ */
 char * get_string ();
 
-// Separate string function
+/**
+ * @brief Separate string function
+ *
+ * @param string
+ * @param separator
+ * @param string_array
+ * @param string_array_size
+ */
 void process_string (char * string, char separator, char *** string_array, unsigned int * string_array_size);
 
-// Count length of string
+/**
+ * @brief Count length of string
+ *
+ * @param string
+ * @return elements count
+ */
 int my_strlen (const char * string);
 
-// Delete strings shorter than N
+/**
+ * @brief Delete strings shorter than N
+ *
+ * @param string_array  pointer to the string array
+ * @param array_size    string array size
+ * @param N
+ */
 void delete_shorter (char *** string_array, unsigned int * array_size, unsigned int N);
 
 //===============================================================================================================
