@@ -362,9 +362,12 @@ int main (int argc, char ** argv)
         printf ("\n");
 
         flush_buffer();
-        for (i = 0; i < string_array_size; i++)
-            free (string_array[i]);
-        free (string_array);
+        if (string_array)
+        {
+            for (i = 0; i < string_array_size; i++)
+                free (string_array[i]);
+            free (string_array);
+        }
     }
 
     free (string);
@@ -705,7 +708,7 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
     }
 
     *string_array = realloc (*string_array, sizeof (char*) * size);
-    assert (*string_array != NULL);
+    assert (*string_array != NULL || *array_size);
 
     *array_size = size;
 }

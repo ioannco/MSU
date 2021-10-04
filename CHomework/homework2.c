@@ -380,7 +380,7 @@ int check_date (unsigned int day, unsigned int month, unsigned int year)
 
     if (month < 8)
     {
-        if (month % 2)
+        if (month % 2 == 0)
             return day < 31;
 
         return day < 32;
@@ -388,7 +388,7 @@ int check_date (unsigned int day, unsigned int month, unsigned int year)
 
     if (month < 13)
     {
-        if (month % 2)
+        if (month % 2 == 0)
             return day < 32;
 
         return day < 31;
