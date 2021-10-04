@@ -15,22 +15,28 @@ int main1 ()
     return 0;
 }
 
-int main ()
+void packing (unsigned short * pack, int day, int month, int year)
 {
-    short pack = (short) rand();
-    short day = 13;
+    day = day << 11;
 
-    printf ("pack = 0x%X\n", pack);
-    printf ("day = %d = 0x%X\n", day, day);
-
-    pack = pack & 0x07FF | (day << 11);
-
-    printf ("pack with day = 0x%X\n", pack);
-
-    return 0; 
+    *pack = *pack | day;
+    *pack = *pack | (month << 7);
 }
 
+int main ()
+{
+    int var = 0;
+
+    unsigned short pack = 0;
+    packing (&pack, day, month, year);
+
+    return 0;
+}
+
+
+
 // Приоритет операций
+
 //
 // 1) [] . -> ()
 // 2) &, *, ++, --, ~, !, -
