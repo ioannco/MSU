@@ -37,7 +37,7 @@ void my_qsort (void * array, unsigned int size, unsigned int member_size, int (*
  *
  * @see my_qsort (void * array, unsigned int size, unsigned int member_size, int (*compare_func) (const void *, const void *))
  */
-void qsort_r    (void * array, unsigned int left, unsigned int right, unsigned int member_size, int (*compare_func) (const void *, const void *));
+void qsort_r (void * array, unsigned int left, unsigned int right, unsigned int member_size, int (*compare_func) (const void *, const void *));
 
 /**
  * @brief Partition of the array
