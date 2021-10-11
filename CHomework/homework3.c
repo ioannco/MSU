@@ -690,7 +690,7 @@ int my_strlen (const char * string)
 
 //===============================================================================================================
 
-void delete_shorter (char *** string_array, unsigned int * array_size, unsigned int N)
+void delete_shorter (char ***      string_array, unsigned int * array_size, unsigned int N)
 {
     unsigned int size = *array_size;  // local copy of array size
     int i = 0;                        // index
