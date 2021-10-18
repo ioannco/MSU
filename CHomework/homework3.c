@@ -165,6 +165,14 @@ int my_strlen (const char * string);
  */
 void delete_shorter (char *** string_array, unsigned int * array_size, unsigned int N);
 
+/**
+ * @brief Count digits in the number
+ *
+ * @param number number to count
+ * @return digits count
+ */
+int count_digits (int number);
+
 //===============================================================================================================
 // Main
 //===============================================================================================================
@@ -257,6 +265,7 @@ int main (int argc, char ** argv)
         while (1)
         {
             int scanf_output = 0;
+
             printf ("Enter separator character (q for exit): ");
 
             scanf_output = scanf ("%c", &separator);
@@ -285,8 +294,9 @@ int main (int argc, char ** argv)
         while (1)
         {
             int scanf_output = 0;
-            printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n");
+            printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n\n> ");
 
+            flush_buffer();
             scanf_output = scanf ("%d", &command);
 
             if (scanf_output == EOF)
@@ -356,7 +366,7 @@ int main (int argc, char ** argv)
 
         for (i = 0; i < string_array_size; i++)
         {
-            printf ("%s\n", string_array[i]);
+            printf ("#%*.d: %s\n", count_digits ((int) string_array_size), i + 1, string_array[i]);
         }
 
         printf ("\n");
@@ -711,4 +721,15 @@ void delete_shorter (char ***      string_array, unsigned int * array_size, unsi
     assert (*string_array != NULL || *array_size);
 
     *array_size = size;
+}
+
+int count_digits (int number)
+{
+    int count = 0;
+
+    while (number)
+    {
+        number /= 10;
+        count++;
+    }
 }
