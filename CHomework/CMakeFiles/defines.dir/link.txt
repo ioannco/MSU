@@ -1,0 +1,1 @@
+/usr/sbin/cc CMakeFiles/defines.dir/CLessons/defines.c.o -o defines  -lm 

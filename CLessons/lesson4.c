@@ -28,7 +28,6 @@ int main ()
     int var = 0;
 
     unsigned short pack = 0;
-    packing (&pack, day, month, year);
 
     return 0;
 }

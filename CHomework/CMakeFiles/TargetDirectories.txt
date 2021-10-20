@@ -1,0 +1,13 @@
+/home/master/code/MSU/CHomework/CMakeFiles/rebuild_cache.dir
+/home/master/code/MSU/CHomework/CMakeFiles/task1.dir
+/home/master/code/MSU/CHomework/CMakeFiles/lesson4.dir
+/home/master/code/MSU/CHomework/CMakeFiles/task3.dir
+/home/master/code/MSU/CHomework/CMakeFiles/lesson3.dir
+/home/master/code/MSU/CHomework/CMakeFiles/edit_cache.dir
+/home/master/code/MSU/CHomework/CMakeFiles/lesson2.dir
+/home/master/code/MSU/CHomework/CMakeFiles/func_ptrs.dir
+/home/master/code/MSU/CHomework/CMakeFiles/task2.dir
+/home/master/code/MSU/CHomework/CMakeFiles/defines.dir
+/home/master/code/MSU/CHomework/CMakeFiles/homework3.dir
+/home/master/code/MSU/CHomework/CMakeFiles/homework2.dir
+/home/master/code/MSU/CHomework/CMakeFiles/homework1.dir

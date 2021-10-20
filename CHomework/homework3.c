@@ -260,6 +260,7 @@ int main (int argc, char ** argv)
             printf ("Enter separator character (q for exit): ");
 
             scanf_output = scanf ("%c", &separator);
+            flush_buffer();
 
             if (scanf_output == EOF)
             {
@@ -288,6 +289,7 @@ int main (int argc, char ** argv)
             printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n");
 
             scanf_output = scanf ("%d", &command);
+            flush_buffer();
 
             if (scanf_output == EOF)
             {
@@ -327,6 +329,7 @@ int main (int argc, char ** argv)
                     printf ("Enter  N: ");
 
                     scanf_output = scanf ("%d", &N);
+                    flush_buffer();
 
                     if (scanf_output == EOF)
                     {
