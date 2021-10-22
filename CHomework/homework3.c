@@ -755,6 +755,7 @@ char get_char_safe (const char *error_message, int (*filter) (int input))
         printf (error_message);
         reset_tmcolor();
 
+        printf ("> ");
         input = getchar();
     }
 
@@ -803,6 +804,7 @@ int get_int_safe (int *dest, const char *error_message, int (*filter) (int))
         printf (error_message);
         reset_tmcolor();
 
+        printf ("> ");
         scanf_output = scanf ("%d", dest);
     }
 
