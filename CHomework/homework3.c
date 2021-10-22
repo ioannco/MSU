@@ -172,8 +172,43 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
  */
 int count_digits (int number);
 
+/**
+ * @brief gets char and filter it for EOF or custom condition described in filter
+ * @param error_message message that displayed if input filtered
+ * @param filter filter function
+ * @return input value
+ */
+char get_char_safe (const char * error_message, int (*filter) (int input));
 
-int get_char_safe (const char * error_message);
+/**
+ * @brief empty filter, always returns 1
+ * @param input integer to filter
+ * @return 1
+ */
+int default_filter (int input);
+
+/**
+ * @brief filter for my commands
+ * @param input integer to filter
+ * @return retry or not
+ */
+int command_filter (int input);
+
+/**
+ * @brief filter for N number
+ * @param input integer to filter
+ * @return retry or not
+ */
+int N_filter (int input);
+
+/**
+ * @brief get integer and filter input
+ * @param dest pointer to variable to store input
+ * @param error_message retry message
+ * @param filter filter
+ * @return success
+ */
+int get_int_safe (int *dest, const char *error_message, int (*filter) (int));
 
 //===============================================================================================================
 // Main
@@ -218,6 +253,7 @@ int main (int argc, char ** argv)
 
         printf ("Enter string: ");
         string = get_string();
+        printf ("Flush input after get_string: %d", flush_buffer());
 
         process_string (string, separator, &string_array, &string_array_size);
 
@@ -240,7 +276,6 @@ int main (int argc, char ** argv)
             default:
                 break;
         }
-
 
         printf ("\n");
 
@@ -264,60 +299,20 @@ int main (int argc, char ** argv)
 
     while (1)
     {
-        while (1)
+        if (!(separator = get_char_safe ("Wrong format, please, try again.\n", default_filter)))
         {
-            int scanf_output = 0;
-
-            printf ("Enter separator character (q for exit): ");
-
-            scanf_output = scanf ("%c", &separator);
-            flush_buffer();
-
-            if (scanf_output == EOF)
-            {
-                set_tmcolor (TM_COLOR_RED);
-                printf ("Reached end of input stream, aborting...\n");
-
-                free (string);
-                return 0;
-            }
-            else if (scanf_output == 1)
-                break;
-
-            set_tmcolor (TM_COLOR_YELLOW);
-            printf ("Wrong format, please, try again.\n");
-            reset_tmcolor ();
-
-            flush_buffer();
+            free (string);
+            return 0;
         }
 
         if (separator == 'q')
             break;
 
-        while (1)
+        printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n\n> ");
+        if (!(command = (int) get_char_safe ("Wrong format, please, try again.\n", command_filter) - '0'))
         {
-            int scanf_output = 0;
-            printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n\n> ");
-
-            flush_buffer();
-            scanf_output = scanf ("%d", &command);
-            flush_buffer();
-
-            if (scanf_output == EOF)
-            {
-                set_tmcolor (TM_COLOR_RED);
-                printf ("Reached end of input stream, aborting...\n");
-                free (string);
-                return 0;
-            }
-            else if (scanf_output == 1 || !command || command > 3)
-                break;
-
-            set_tmcolor (TM_COLOR_YELLOW);
-            printf ("Wrong format, please, try again.");
-            reset_tmcolor ();
-
-            flush_buffer();
+            free (string);
+            return 1;
         }
 
         process_string (string, separator, &string_array, &string_array_size);
@@ -335,29 +330,20 @@ int main (int argc, char ** argv)
                 break;
 
             case 3:
-                while (1)
+                if (!(get_int_safe (&N, "Wrong format, please, try again.\n", N_filter)))
                 {
-                    int scanf_output = 0;
-                    printf ("Enter  N: ");
-
-                    scanf_output = scanf ("%d", &N);
-                    flush_buffer();
-
-                    if (scanf_output == EOF)
+                    if (string) free (string);
+                    if (string_array)
                     {
-                        set_tmcolor (TM_COLOR_RED);
-                        printf ("Reached end of input stream, aborting...\n");
-                        free (string);
-                        return 0;
+                        for (i = 0; i < string_array_size; i++)
+                            if (string_array[i])
+                            {
+                                free (string_array[i]);
+                                string_array[i] = NULL;
+                            }
+
+                        free (string_array);
                     }
-                    else if (scanf_output == 1 || !command)
-                        break;
-
-                    set_tmcolor (TM_COLOR_YELLOW);
-                    printf ("Wrong format, please, try again.");
-                    reset_tmcolor ();
-
-                    flush_buffer();
                 }
 
                 delete_shorter (&string_array, &string_array_size, N);
@@ -376,7 +362,6 @@ int main (int argc, char ** argv)
 
         printf ("\n");
 
-        flush_buffer();
         if (string_array)
         {
             for (i = 0; i < string_array_size; i++)
@@ -734,6 +719,8 @@ void delete_shorter (char ***      string_array, unsigned int * array_size, unsi
     *array_size = size;
 }
 
+//===============================================================================================================
+
 int count_digits (int number)
 {
     int count = 0;
@@ -747,7 +734,9 @@ int count_digits (int number)
     return count;
 }
 
-int get_char_safe (const char *error_message)
+//===============================================================================================================
+
+char get_char_safe (const char *error_message, int (*filter) (int input))
 {
     int input = getchar();
 
@@ -756,10 +745,65 @@ int get_char_safe (const char *error_message)
         set_tmcolor (TM_COLOR_RED);
         printf ("Reached end of file, exiting...\n");
         reset_tmcolor();
-        exit(1);
+
+        return 0;
     }
 
+    while (flush_buffer() || filter (input))
+    {
+        set_tmcolor (TM_COLOR_YELLOW);
+        printf (error_message);
+        reset_tmcolor();
 
+        input = getchar();
+    }
+
+    return (char) input;
+}
+
+//===============================================================================================================
+
+int default_filter (int input)
+{
+    return 1;
+}
+
+//===============================================================================================================
+
+int command_filter (int input)
+{
+    int command = input - '0';
+    return command > 0 && command < 4;
+}
+
+int N_filter (int input)
+{
+    return input >= 0;
+}
+
+int get_int_safe (int *dest, const char *error_message, int (*filter) (int))
+{
+    int scanf_output = 0;
+
+    scanf_output = scanf ("%d", dest);
+
+    if (scanf_output == EOF)
+    {
+        set_tmcolor (TM_COLOR_RED);
+        printf ("Reached end of file, exiting...\n");
+        reset_tmcolor();
+
+        return 1;
+    }
+
+    while (scanf_output != 1 || flush_buffer() || filter (*dest))
+    {
+        set_tmcolor (TM_COLOR_YELLOW);
+        printf (error_message);
+        reset_tmcolor();
+
+        scanf_output = scanf ("%d", dest);
+    }
 
     return 0;
 }
