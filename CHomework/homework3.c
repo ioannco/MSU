@@ -253,7 +253,6 @@ int main (int argc, char ** argv)
 
         printf ("Enter string: ");
         string = get_string();
-        printf ("Flush input after get_string: %d", flush_buffer());
 
         process_string (string, separator, &string_array, &string_array_size);
 
@@ -299,6 +298,7 @@ int main (int argc, char ** argv)
 
     while (1)
     {
+        printf ("Enter separator character (q to exit): ");
         if (!(separator = get_char_safe ("Wrong format, please, try again.\n", default_filter)))
         {
             free (string);
@@ -749,7 +749,7 @@ char get_char_safe (const char *error_message, int (*filter) (int input))
         return 0;
     }
 
-    while (flush_buffer() || filter (input))
+    while (flush_buffer() || !filter (input))
     {
         set_tmcolor (TM_COLOR_YELLOW);
         printf (error_message);
@@ -773,6 +773,7 @@ int default_filter (int input)
 int command_filter (int input)
 {
     int command = input - '0';
+
     return command > 0 && command < 4;
 }
 
@@ -796,7 +797,7 @@ int get_int_safe (int *dest, const char *error_message, int (*filter) (int))
         return 1;
     }
 
-    while (scanf_output != 1 || flush_buffer() || filter (*dest))
+    while (scanf_output != 1 || flush_buffer() || !filter (*dest))
     {
         set_tmcolor (TM_COLOR_YELLOW);
         printf (error_message);
