@@ -117,7 +117,7 @@ int run_tests (unsigned int tests_count);
 /**
  * @brief Console buffer flush function
  */
-void flush_buffer ();
+int flush_buffer ();
 
 /**
  * @brief Cyclic shift to the left
@@ -128,7 +128,6 @@ void flush_buffer ();
  */
 void ROL (char ** array, unsigned int start, unsigned int end);
 
-//
 /**
  * @brief Get string from input.
  *
@@ -172,6 +171,9 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
  * @return digits count
  */
 int count_digits (int number);
+
+
+int get_char_safe (const char * error_message);
 
 //===============================================================================================================
 // Main
@@ -552,11 +554,17 @@ int run_tests (unsigned int tests_count)
 
 //===============================================================================================================
 
-void flush_buffer ()
+int flush_buffer ()
 {
     int c;
+    int i = 0;
 
-    while ((c = getchar()) != EOF && c != '\n');
+    while ((c = getchar()) != EOF && c != '\n')
+    {
+        i++;
+    }
+
+    return i;
 }
 
 //===============================================================================================================
@@ -732,4 +740,23 @@ int count_digits (int number)
         number /= 10;
         count++;
     }
+
+    return count;
+}
+
+int get_char_safe (const char *error_message)
+{
+    int input = getchar();
+
+    if (input == EOF)
+    {
+        set_tmcolor (TM_COLOR_RED);
+        printf ("Reached end of file, exiting...\n");
+        reset_tmcolor();
+        exit(1);
+    }
+
+
+
+    return 0;
 }
