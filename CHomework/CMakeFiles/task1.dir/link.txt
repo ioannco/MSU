@@ -1,0 +1,1 @@
+/usr/sbin/cc CMakeFiles/task1.dir/ejudge/task1.c.o -o task1  -lm 

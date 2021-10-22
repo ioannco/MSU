@@ -1,0 +1,1 @@
+/usr/sbin/cc CMakeFiles/lesson2.dir/CLessons/lesson2.c.o -o lesson2  -lm 

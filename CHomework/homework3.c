@@ -271,6 +271,7 @@ int main (int argc, char ** argv)
             printf ("Enter separator character (q for exit): ");
 
             scanf_output = scanf ("%c", &separator);
+            flush_buffer();
 
             if (scanf_output == EOF)
             {
@@ -300,6 +301,7 @@ int main (int argc, char ** argv)
 
             flush_buffer();
             scanf_output = scanf ("%d", &command);
+            flush_buffer();
 
             if (scanf_output == EOF)
             {
@@ -339,6 +341,7 @@ int main (int argc, char ** argv)
                     printf ("Enter  N: ");
 
                     scanf_output = scanf ("%d", &N);
+                    flush_buffer();
 
                     if (scanf_output == EOF)
                     {
