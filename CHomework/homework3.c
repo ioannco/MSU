@@ -330,6 +330,7 @@ int main (int argc, char ** argv)
                 break;
 
             case 3:
+                printf ("Enter N: ");
                 if (!(get_int_safe (&N, "Wrong format, please, try again.\n", N_filter)))
                 {
                     if (string) free (string);
@@ -346,7 +347,12 @@ int main (int argc, char ** argv)
                     }
                 }
 
+                printf ("deliting...\n");
+
                 delete_shorter (&string_array, &string_array_size, N);
+
+                printf ("string array size = %d\n", string_array_size);
+
                 break;
 
             default:
@@ -696,7 +702,7 @@ int my_strlen (const char * string)
 
 //===============================================================================================================
 
-void delete_shorter (char ***      string_array, unsigned int * array_size, unsigned int N)
+void delete_shorter (char *** string_array, unsigned int * array_size, unsigned int N)
 {
     unsigned int size = *array_size;  // local copy of array size
     int i = 0;                        // index
@@ -795,7 +801,7 @@ int get_int_safe (int *dest, const char *error_message, int (*filter) (int))
         printf ("Reached end of file, exiting...\n");
         reset_tmcolor();
 
-        return 1;
+        return 0;
     }
 
     while (scanf_output != 1 || flush_buffer() || !filter (*dest))
@@ -808,5 +814,5 @@ int get_int_safe (int *dest, const char *error_message, int (*filter) (int))
         scanf_output = scanf ("%d", dest);
     }
 
-    return 0;
+    return 1;
 }
