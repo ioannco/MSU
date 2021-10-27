@@ -241,6 +241,13 @@ int main (int argc, char ** argv)
             return 0;
         }
 
+        if (command == 3 && argc != 4)
+        {
+            set_tmcolor (TM_COLOR_RED);
+            printf ("Wrong parameters format.\n");
+            return 0;
+        }
+
         if (argc >= 4)
         {
             if (command != 3 || sscanf (argv[3], "%d", &N) != 1)
