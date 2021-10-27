@@ -164,6 +164,16 @@ int my_strlen (const char * string);
  */
 void delete_shorter (char *** string_array, unsigned int * array_size, unsigned int N);
 
+
+/**
+ * @brief Delete strings larger than N
+ *
+ * @param string_array  pointer to the string array
+ * @param array_size    string array size
+ * @param N
+ */
+void delete_larger (char *** string_array, unsigned int * array_size, unsigned int N);
+
 /**
  * @brief Count digits in the number
  *
@@ -276,7 +286,7 @@ int main (int argc, char ** argv)
                 break;
 
             case 3:
-                delete_shorter (&string_array, &string_array_size, N);
+                delete_larger (&string_array, &string_array_size, N);
                 break;
 
             default:
@@ -354,7 +364,7 @@ int main (int argc, char ** argv)
                     }
                 }
 
-                delete_shorter (&string_array, &string_array_size, N);
+                delete_larger (&string_array, &string_array_size, N);
 
                 break;
 
@@ -727,6 +737,32 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
 
     *array_size = size;
 }
+
+//===============================================================================================================
+
+void delete_larger (char *** string_array, unsigned int * array_size, unsigned int N)
+{
+    unsigned int size = *array_size;  // local copy of array size
+    int i = 0;                        // index
+
+    while (i < size)
+    {
+        if (my_strlen ((*string_array)[i]) > N)
+        {
+            free ((*string_array)[i]);
+            ROL (*string_array, i, size - 1);
+            size--;
+        }
+        else
+            i++;
+    }
+
+    *string_array = realloc (*string_array, sizeof (char*) * size);
+    assert (*string_array != NULL || *array_size);
+
+    *array_size = size;
+}
+
 
 //===============================================================================================================
 
