@@ -325,7 +325,7 @@ int main (int argc, char ** argv)
         if (separator == 'q')
             break;
 
-        printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings, that shorter than N\n\n> ");
+        printf ("Enter mode.\n\n(1) Sort strings lower to upper\n(2) Sort strings upper to lower\n(3) Delete strings larger than N\n\n> ");
         if (!(command = (int) get_char_safe ("Wrong format, please, try again.\n", command_filter) - '0'))
         {
             free (string);
