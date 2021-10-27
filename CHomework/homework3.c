@@ -354,11 +354,7 @@ int main (int argc, char ** argv)
                     }
                 }
 
-                printf ("deliting...\n");
-
                 delete_shorter (&string_array, &string_array_size, N);
-
-                printf ("string array size = %d\n", string_array_size);
 
                 break;
 
