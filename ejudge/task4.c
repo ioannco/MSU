@@ -19,7 +19,7 @@ void process (struct List *pl, const char *str);
 
 int main ()
 {
-    char *strs[STRING_COUNT] = {"c", "b", "a    "};
+    char *strs[STRING_COUNT] = {"c", "b", "a"};
     struct List *pl = malloc (sizeof (struct Node));
     int i = 0;
     struct Node * current = NULL;
@@ -45,7 +45,16 @@ int main ()
 
     pl->last = current;
 
+    printf ("list before process: \n");
+
+    for (current = pl->first; current != NULL; current = current->next)
+    {
+        printf("%s\n", current->elem);
+    }
+    
     process (pl, "b");
+
+    printf ("list after: \n");
 
     for (current = pl->first; current != NULL; current = current->next)
     {
@@ -55,4 +64,67 @@ int main ()
     free(pl);
 }
 
-#include "task4_only_function.h"
+void process (struct List *pl, const char *str)
+{
+    struct Node * current = pl->first;
+    struct Node * end = pl->last;
+
+    if (current == end)
+        return;
+
+    do
+    {
+        if (strcmp (current->elem, str) == 0)
+        {
+            if (current->prev)
+                current->prev->next = current->next;
+
+            if (current->next)
+                current->next->prev = current->prev;
+
+            if (pl->first == current)
+					pl->first = current->next;
+			if (pl->last == current)
+					pl->last = current->prev;
+           
+		   	struct Node * next = current->next;
+
+            free (current->elem);
+            current->elem = NULL;
+
+            free (current);
+
+            current = next;
+                    
+        }
+        else if (strcmp (current->elem, str) > 0)
+        {
+
+            if (!current->next)
+                break;
+
+            current->next->prev = current->prev;
+
+            if (current->prev)
+                current->prev->next = current->next;
+            else
+                current->next->prev = NULL;
+
+            struct Node * next = current->next;
+
+            current->prev = pl->last;
+            current->next = NULL;
+
+            pl->last->next = current;
+			pl->last = current;
+
+            current = next;
+			if (pl->first == current)
+					pl->first = next;
+        }
+        else
+            current = current->next;
+
+    } while (current && current != end->next);
+}
+
