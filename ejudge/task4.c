@@ -19,7 +19,7 @@ void process (struct List *pl, const char *str);
 
 int main ()
 {
-    char *strs[STRING_COUNT] = {"c", "b", "a"};
+    char *strs[STRING_COUNT] = {"f", "e", "d"};
     struct List *pl = malloc (sizeof (struct Node));
     int i = 0;
     struct Node * current = NULL;
@@ -59,6 +59,8 @@ int main ()
     for (current = pl->first; current != NULL; current = current->next)
     {
         printf("%s\n", current->elem);
+
+        printf ("el->prev = %X, el->next = %X\n", current->prev, current->next);
     }
 
     free(pl);
@@ -66,6 +68,9 @@ int main ()
 
 void process (struct List *pl, const char *str)
 {
+    if (!pl || !pl->first || !pl->last)
+        return;
+
     struct Node * current = pl->first;
     struct Node * end = pl->last;
 
@@ -118,13 +123,14 @@ void process (struct List *pl, const char *str)
             pl->last->next = current;
 			pl->last = current;
 
+            if (pl->first == current)
+                pl->first = next;
+
             current = next;
-			if (pl->first == current)
-					pl->first = next;
         }
         else
             current = current->next;
 
-    } while (current && current != end->next);
+    } while (current && current != end);
 }
 

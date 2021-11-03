@@ -468,8 +468,8 @@ void swap (void * a, void * b, unsigned  int member_size)
 int sort_unit_test (unsigned int array_length)
 {
     int i = 0;
-    char * array1 = malloc (array_length);
-    char * array2 = malloc (array_length);
+    char * array1 = (char *) malloc (array_length);
+    char * array2 = (char *) malloc (array_length);
 
     assert (array1 != NULL);
     assert (array2 != NULL);
@@ -594,7 +594,7 @@ char * get_string ()
 {
     int c = 0;                                      // character
     unsigned int string_size = 0, alloc_size = 1;   // string size and allocation size
-    char * string = malloc (alloc_size);            //
+    char * string = (char *) malloc (alloc_size);            //
 
     assert (string != NULL);
 
@@ -607,7 +607,7 @@ char * get_string ()
         if (string_size > alloc_size)
         {
             alloc_size *= 2;
-            string = realloc (string, alloc_size);
+            string = (char *) realloc (string, alloc_size);
             assert (string != NULL);
         }
 
@@ -615,7 +615,7 @@ char * get_string ()
     }
 
     if (alloc_size > string_size + 1)
-        string = realloc (string, string_size + 1);
+        string = (char *) realloc (string, string_size + 1);
 
     assert (string != NULL);
 
@@ -637,9 +637,9 @@ void process_string (char * string, char separator, char *** string_array, unsig
         (*string_array_size)++;
 
         if (i == 0)
-            *string_array = malloc (sizeof (char *));
+            *string_array = (char **) malloc (sizeof (char *));
         else
-            *string_array = realloc (*string_array, *string_array_size * sizeof (char*));
+            *string_array = (char **) realloc (*string_array, *string_array_size * sizeof (char*));
 
         assert (*string_array != NULL);
 
@@ -648,9 +648,9 @@ void process_string (char * string, char separator, char *** string_array, unsig
             string_size++;
 
             if (string_size == 1)
-                (*string_array)[*string_array_size - 1] = malloc (sizeof (char*));
+                (*string_array)[*string_array_size - 1] = (char *) malloc (sizeof (char));
             else
-                (*string_array)[*string_array_size - 1] = realloc ((*string_array)[*string_array_size - 1], sizeof(char) * string_size);
+                (*string_array)[*string_array_size - 1] = (char *) realloc ((*string_array)[*string_array_size - 1], sizeof(char) * string_size);
 
             assert (*string_array != NULL);
 
@@ -732,7 +732,7 @@ void delete_shorter (char *** string_array, unsigned int * array_size, unsigned 
             i++;
     }
 
-    *string_array = realloc (*string_array, sizeof (char*) * size);
+    *string_array = (char **) realloc (*string_array, sizeof (char*) * size);
     assert (*string_array != NULL || *array_size);
 
     *array_size = size;
@@ -757,7 +757,7 @@ void delete_larger (char *** string_array, unsigned int * array_size, unsigned i
             i++;
     }
 
-    *string_array = realloc (*string_array, sizeof (char*) * size);
+    *string_array = (char **) realloc (*string_array, sizeof (char*) * size);
     assert (*string_array != NULL || *array_size);
 
     *array_size = size;
