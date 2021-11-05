@@ -656,6 +656,7 @@ void process_string (char * string, char separator, char *** string_array, unsig
 
             if (string[i] == separator || string[i] == '\0')
             {
+					printf("***found separator at %d\n", i);
                 (*string_array)[*string_array_size - 1][string_size - 1] = '\0';
                 i++;
                 break;

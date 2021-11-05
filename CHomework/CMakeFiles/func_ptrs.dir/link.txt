@@ -1,1 +1,0 @@
-/usr/sbin/cc CMakeFiles/func_ptrs.dir/CLessons/func_ptrs.c.o -o func_ptrs  -lm 
