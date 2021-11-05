@@ -104,7 +104,6 @@ void process (struct List *pl, const char *str)
         }
         else if (strcmp (current->elem, str) > 0)
         {
-
             if (!current->next)
                 break;
 

@@ -226,7 +226,7 @@ int get_int_safe (int *dest, const char *error_message, int (*filter) (int));
 
 int main (int argc, char ** argv)
 {
-    char separator = 0;                   // string separator
+    char separator = 0;                     // string separator
     int command = -1;                       // user command
     char * string = NULL;                   // string we need to process
     int N = -1;                             // delete count
@@ -429,7 +429,7 @@ unsigned int partition (void * array, unsigned int left, unsigned int right, uns
     void * p = malloc (member_size);
     assert (p != NULL);
 
-    memcpy (p, array + ((left + right) / 2) * member_size, member_size);
+    memcpy (p, (void *)((char *) array + ((left + right) / 2) * member_size), member_size);
 
     while (1)
     {
@@ -656,6 +656,7 @@ void process_string (char * string, char separator, char *** string_array, unsig
 
             if (string[i] == separator || string[i] == '\0')
             {
+                printf("***found separator at %d\n", i);
                 (*string_array)[*string_array_size - 1][string_size - 1] = '\0';
                 i++;
                 break;
