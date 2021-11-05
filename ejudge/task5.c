@@ -49,6 +49,8 @@ int main (int argc, char ** argv)
             delete_node (min);
     }
 
+    printf ("\n");
+
     return 0;
 }
 
