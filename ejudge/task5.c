@@ -29,6 +29,7 @@ int main (int argc, char ** argv)
     {
         FILE * file = fopen(argv[i + 1], "r");
         int num = 0;
+
         assert (file != NULL);
 
         if (fscanf (file, "%d", &num) != 1)
@@ -44,7 +45,7 @@ int main (int argc, char ** argv)
     {
         struct FileNode * min = min_node (files_list);
         printf ("%d ", min->num);
-        if (fscanf (min->file, "%d", &(min->num)))
+        if (fscanf (min->file, "%d", &(min->num)) != 1)
             delete_node (min);
     }
 
@@ -91,7 +92,7 @@ void add_node (struct FileNode *head, FILE *file, int num)
     new->prev = head;
     new->next = head->next;
 
-    head->next->prev = new;
+    if (head->next) head->next->prev = new;
     head->next = new;
 
     new->file = file;
