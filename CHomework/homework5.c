@@ -17,7 +17,7 @@ struct config_node
 struct config_node * read_config (char * filename, int * process_count);
 int process_text (char * filename, struct config_node * config, int my_proc_id);
 int fstrlen (int fd);
-void skip_word (int fd);
+int skip_word (int fd);
 
 int main (int argv, char ** argc)
 {
@@ -42,9 +42,11 @@ int main (int argv, char ** argc)
             break;
     }
 
-    printf ("[PID %d]: my id is %d. My key is %c and replacement is %c\n", getpid(), i, config[i].key, config[i].replacement);
+    printf ("[PID %d]: id = %d. My key is %c and replacement is %c. Starting processing..\n", getpid(), i, config[i].key, config[i].replacement);
 
     process_text (argc[1], config, i);
+
+    printf ("[PID %d]: id = %d. Finished processing.\n", getpid(), i);
 
     free (config);
 
@@ -183,11 +185,17 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
         off_t word_start = 0;
 
         if (buffer != config[my_proc_id].key)
+        {
+            if (buffer != ' ' && buffer != ',' && buffer != '.')
+                if (skip_word(fd))
+                    break;
             continue;
+        }
 
         if (buffer == '*')
         {
-            skip_word (fd);
+            if (skip_word (fd))
+                break;
             continue;
         }
 
@@ -196,7 +204,8 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
         word_length = fstrlen (fd);
         if (word_length < 10)
         {
-            skip_word (fd);
+            if (skip_word (fd))
+                break;
             continue;
         }
 
@@ -244,7 +253,7 @@ int fstrlen (int fd)
     return length;
 }
 
-void skip_word (int fd)
+int skip_word (int fd)
 {
     char buffer = 0;
         
@@ -253,8 +262,11 @@ void skip_word (int fd)
     while (read (fd, &buffer, 1))
     {
         if (buffer == ' ' || buffer == '.' || buffer == ',')
-            break;
+        {
+            lseek (fd, -1, SEEK_CUR);
+            return 0;
+        }
     }
 
-    lseek (fd, -1, SEEK_CUR);
+    return 1;
 }
