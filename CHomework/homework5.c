@@ -54,26 +54,38 @@ int main (int argv, char ** argc)
 struct config_node * read_config (char * filename, int * process_count)
 {
     int i = 0;
+    int input = 0;
     struct config_node * config = NULL;
 
     FILE * config_file = fopen (filename, "r");
     
     if (!config_file)
     {
-        printf ("error while opening file: %s\n", strerror (errno));
+        printf ("error while opening config file: %s\n", strerror (errno));
         return NULL;
     }
     
     if (fscanf (config_file, "%d", process_count) != 1)
     {
-        printf ("error while reading process count\n");
+        printf ("config error: error while reading process count\n");
         fclose (config_file);
         return NULL;
     }
   
     if (*process_count < 1)
     {
-        printf("process count is less than 1\n");
+        printf("config error: process count is less than 1\n");
+        fclose (config_file);
+        return NULL;
+    }
+
+    while ((input = fgetc (config_file)) == ' ')
+    {
+    }
+
+    if (input != '\n')
+    {
+        printf ("config error: excess symbols in first string\n");
         fclose (config_file);
         return NULL;
     }
@@ -83,33 +95,64 @@ struct config_node * read_config (char * filename, int * process_count)
    
     for (i = 0; i < *process_count; i++)
     {
-        int input = 0;
         int j = 0;
 
-        while ((input = fgetc(config_file)) == ' ' || input == '\n')
-        {}
+        while ((input = fgetc(config_file)) == ' ')
+        {
+        }
         
         if (input == '*')
         {
-            printf ("'*' is not allowed to be a key\n");
+            printf ("config error: '*' is not allowed to be a key\n");
+            fclose (config_file);
+            free (config);
             return NULL;
         }
 
+        if (input == '\n')
+        {
+            printf ("config error: key is missing in string #%d\n", i);
+            fclose (config_file);
+            free (config);
+            return NULL;
+        } 
+
         config[i].key = (char) input;
         
-        while ((input = fgetc(config_file)) == ' ' || input == '\n')
-        {}
+        while ((input = fgetc(config_file)) == ' ')
+        {
+        }
+
+        if (input == '\n')
+        {
+            printf ("config error: missing replacement to '%c' key in string #%d\n", config[i].key, i + 2);
+            fclose (config_file);
+            free (config);
+            return NULL;  
+        }
 
         config[i].replacement = (char) input;
 
         for (j = 0; j < i; j++)
             if (config[i].key == config[j].key)
             {
-                printf ("keys conflict in config\n");
+                printf ("config error: keys conflict\n");
                 fclose (config_file);
                 free (config);
                 return NULL;
             }
+
+        while ((input = fgetc(config_file)) == ' ')
+        {
+        }
+
+        if (input != '\n')
+        {
+            printf ("config error: excess symbols in string #%d\n", i + 2);
+            free (config);
+            fclose (config_file);
+            return NULL;    
+        }
     }
 
     fclose (config_file);
