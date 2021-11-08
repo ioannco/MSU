@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -47,8 +48,20 @@ int main (int argv, char ** argc)
     process_text (argc[1], config, i);
 
     printf ("[PID %d]: id = %d. Finished processing.\n", getpid(), i);
-
     free (config);
+
+    if (!i)
+    {
+        for (i = 0; i < process_count - 1; i++)
+        {
+            pid_t child_pid = wait(NULL);
+
+            if (child_pid > 0) 
+                printf ("[PID %d] father: child %d successifully terminated\n", getpid(), child_pid);
+            else
+                printf ("[pid %d] father: wait returned an error.\n", getpid());
+        }
+    }
 
     return 0;
 }
@@ -175,12 +188,12 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
 
     if (fd < 0)
     {  
-        printf ("Error while opening text file: %s\n", strerror (errno));
+        printf ("error while opening text file: %s\n", strerror (errno));
         close(fd);
         return 1;
     }
 
-    while (read (fd, &buffer, 1))
+    while (read (fd, &buffer, 1) > 0)
     {
         off_t word_start = 0;
 
@@ -199,7 +212,7 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
             continue;
         }
 
-        lseek (fd, -1, SEEK_CUR);
+        assert (lseek (fd, -1, SEEK_CUR) >= 0);
 
         word_length = fstrlen (fd);
         if (word_length < 10)
@@ -210,9 +223,10 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
         }
 
         word_start = lseek (fd, 0, SEEK_CUR);
+        assert (word_start >= 0);
 
-        write (fd, "*", 1);
-        write (fd, &(config[my_proc_id].replacement), 1);
+        assert (write (fd, "*", 1) != -1);
+        assert (write (fd, &(config[my_proc_id].replacement), 1) != -1);
         
         if (my_proc_id)
         {
@@ -225,11 +239,14 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
         }
 
         
-        lseek (fd, word_start + word_length - strlen (replacement_buffer), SEEK_SET);
-        write (fd, replacement_buffer, strlen (replacement_buffer));
+        assert (lseek (fd, word_start + word_length - strlen (replacement_buffer), SEEK_SET) != -1);
+        assert (write (fd, replacement_buffer, strlen (replacement_buffer)) != -1);
     }
 
-    close (fd);
+    if (close (fd) == -1)
+    {
+        printf ("failed to close file: %s\n", strerror (errno));
+    }
     return 0;
 }
 
@@ -240,8 +257,9 @@ int fstrlen (int fd)
     int length = 0;
 
     assert (fd >= 0);
+    assert (start_position >= 0);
 
-    while (read (fd, &buffer, 1))
+    while (read (fd, &buffer, 1) > 0)
     {
         if (buffer == ' ' || buffer == ',' || buffer == '.')
             break;
@@ -249,7 +267,7 @@ int fstrlen (int fd)
         length++;
     }
 
-    lseek (fd, start_position, SEEK_SET);
+    assert (lseek (fd, start_position, SEEK_SET) != -1);
     return length;
 }
 
@@ -259,11 +277,11 @@ int skip_word (int fd)
         
     assert (fd >= 0);
 
-    while (read (fd, &buffer, 1))
+    while (read (fd, &buffer, 1) > 0)
     {
         if (buffer == ' ' || buffer == '.' || buffer == ',')
         {
-            lseek (fd, -1, SEEK_CUR);
+            assert (lseek (fd, -1, SEEK_CUR) != -1);
             return 0;
         }
     }
