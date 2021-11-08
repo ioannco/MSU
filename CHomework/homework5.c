@@ -10,15 +10,59 @@
 #include <fcntl.h>
 #include <errno.h>
 
+/****************************************************************************************************************/
+
 struct config_node 
 {
     char key, replacement;
 };
 
+/****************************************************************************************************************/
+
+/**
+ * @brief Reads config and generates config_node array
+ *
+ * @param filename Name of the config file
+ * @param process_count Pointer to the process counter integer
+ *
+ * @return Config AKA config_node array
+ */
 struct config_node * read_config (char * filename, int * process_count);
+
+/**
+ * @brief Processes text in conditions of homework 5 from moodle.cs.msu.ru group 217
+ *
+ * @param filename Name of the text file to process
+ * @param config Configuration of editor
+ * @param my_proc_id Id of worker
+ *
+ * @return 0 if success or 1 if not
+ */
 int process_text (char * filename, struct config_node * config, int my_proc_id);
+
+/**
+ * @brief Counts characters in file starting from latest readed/writed byte and ending if delimiter is found.
+ *
+ * Delimiter is ' ', ',' or '.'
+ *
+ * @param fd File descriptor
+ *
+ * @return Word length
+ */
 int fstrlen (int fd);
+
+/**
+ * @brief Skips word starting from last read/write byte and eding if delimiter is found
+ *
+ * Delimiter is ' ', ',' or '.'
+ *
+ * @param fd File descriptor
+ *
+ * @return 0 if sucess and 1 if EOF was found 
+ */
 int skip_word (int fd);
+
+/****************************************************************************************************************/
 
 int main (int argv, char ** argc)
 {
@@ -39,10 +83,10 @@ int main (int argv, char ** argc)
     
     for (i = process_count - 1; i > 0; i--)
     {
-        if (fork())
+        if (!fork())
             break;
     }
-
+    
     printf ("[PID %d]: id = %d. My key is %c and replacement is %c. Starting processing..\n", getpid(), i, config[i].key, config[i].replacement);
 
     process_text (argc[1], config, i);
@@ -52,19 +96,26 @@ int main (int argv, char ** argc)
 
     if (!i)
     {
-        for (i = 0; i < process_count - 1; i++)
+        for (i = 1; i < process_count; i++)
         {
-            pid_t child_pid = wait(NULL);
-
-            if (child_pid > 0) 
-                printf ("[PID %d] father: child %d successifully terminated\n", getpid(), child_pid);
+            pid_t child_pid = wait (NULL);
+            
+            if (child_pid > 0)
+            {
+                printf ("[PID %d FATHER]: child process with PID %d successifully exited\n", getpid(), child_pid);
+            }
             else
-                printf ("[pid %d] father: wait returned an error.\n", getpid());
+            {
+                printf ("[PID %d FATHER]: error while waiting child process to exit.\n", getpid());
+                return 1; 
+            }
         }
     }
 
     return 0;
 }
+
+/****************************************************************************************************************/
 
 struct config_node * read_config (char * filename, int * process_count)
 {
@@ -174,6 +225,8 @@ struct config_node * read_config (char * filename, int * process_count)
     return config;
 }
 
+/****************************************************************************************************************/
+
 int process_text (char * filename, struct config_node * config, int my_proc_id)
 {
     int fd = 0;
@@ -250,6 +303,8 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
     return 0;
 }
 
+/****************************************************************************************************************/
+
 int fstrlen (int fd)
 {
     char buffer = 0;
@@ -270,6 +325,8 @@ int fstrlen (int fd)
     assert (lseek (fd, start_position, SEEK_SET) != -1);
     return length;
 }
+
+/****************************************************************************************************************/
 
 int skip_word (int fd)
 {
