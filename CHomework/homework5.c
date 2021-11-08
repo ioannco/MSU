@@ -69,12 +69,16 @@ int main (int argv, char ** argc)
     int process_count = 0;
     struct config_node * config = NULL;
     int i = 0;
+    int print_logs = 0;
 
-    if (argv != 3)
+    if (argv < 3)
     {
         printf ("error: filenames params required\n"); 
         return -1;
     }  
+    
+    if (argv > 3 && (!strcmp (argc[3], "--logs") || !strcmp (argc[3], "-l")))
+        print_logs = 1;
 
     config = read_config (argc[2], &process_count);
     
@@ -87,11 +91,11 @@ int main (int argv, char ** argc)
             break;
     }
     
-    printf ("[PID %d]: id = %d. My key is %c and replacement is %c. Starting processing..\n", getpid(), i, config[i].key, config[i].replacement);
+    if (print_logs) printf ("[PID %d]: id = %d. My key is %c and replacement is %c. Starting processing..\n", getpid(), i, config[i].key, config[i].replacement);
 
     process_text (argc[1], config, i);
 
-    printf ("[PID %d]: id = %d. Finished processing.\n", getpid(), i);
+    if (print_logs) printf ("[PID %d]: id = %d. Finished processing.\n", getpid(), i);
     free (config);
 
     if (!i)
@@ -100,15 +104,20 @@ int main (int argv, char ** argc)
         {
             pid_t child_pid = wait (NULL);
             
-            if (child_pid > 0)
+            if (print_logs)
             {
-                printf ("[PID %d FATHER]: child process with PID %d successifully exited\n", getpid(), child_pid);
+                if (child_pid > 0)
+                {
+                    printf ("[PID %d FATHER]: child process with PID %d successifully exited\n", getpid(), child_pid);
+                }
+                else
+                {
+                    printf ("[PID %d FATHER]: error while waiting child process to exit.\n", getpid());
+                    return 1; 
+        
+                }   
             }
-            else
-            {
-                printf ("[PID %d FATHER]: error while waiting child process to exit.\n", getpid());
-                return 1; 
-            }
+            
         }
     }
 
@@ -167,9 +176,17 @@ struct config_node * read_config (char * filename, int * process_count)
         {
         }
         
+        if (input == ',' || input == '.')
+        {
+            printf ("config error: (line %d) delimiter is not allowed to be a key\n", i + 2);
+            fclose (config_file);
+            free (config);
+            return NULL;
+        }
+
         if (input == '*')
         {
-            printf ("config error: '*' is not allowed to be a key\n");
+            printf ("config error: (line %d) '*' is not allowed to be a key\n", i + 2);
             fclose (config_file);
             free (config);
             return NULL;
@@ -177,7 +194,7 @@ struct config_node * read_config (char * filename, int * process_count)
 
         if (input == '\n')
         {
-            printf ("config error: key is missing in string #%d\n", i);
+            printf ("config error: (line %d) key is missing.\n", i + 2);
             fclose (config_file);
             free (config);
             return NULL;
@@ -191,7 +208,7 @@ struct config_node * read_config (char * filename, int * process_count)
 
         if (input == '\n')
         {
-            printf ("config error: missing replacement to '%c' key in string #%d\n", config[i].key, i + 2);
+            printf ("config error: (line %d) missing replacement to '%c' key.\n", i + 2, config[i].key);
             fclose (config_file);
             free (config);
             return NULL;  
@@ -202,7 +219,7 @@ struct config_node * read_config (char * filename, int * process_count)
         for (j = 0; j < i; j++)
             if (config[i].key == config[j].key)
             {
-                printf ("config error: keys conflict\n");
+                printf ("config error: (line %d) keys conflict\n", i + 2);
                 fclose (config_file);
                 free (config);
                 return NULL;
@@ -214,12 +231,15 @@ struct config_node * read_config (char * filename, int * process_count)
 
         if (input != '\n')
         {
-            printf ("config error: excess symbols in string #%d\n", i + 2);
+            printf ("config error: (line %d) excess symbols.\n", i + 2);
             free (config);
             fclose (config_file);
             return NULL;    
         }
     }
+    
+    if (fgetc(config_file) != EOF)
+        printf ("config warning: found excess lines in config file. Only %d config pairs are in use. Other symbols ignored.\n", *process_count); 
 
     fclose (config_file);
     return config;
