@@ -25,7 +25,7 @@ struct config_node
  * @param filename Name of the config file
  * @param process_count Pointer to the process counter integer
  *
- * @return Config AKA config_node array
+ * @return Config AKA config_node array if sucess or NULL is there is an error
  */
 struct config_node * read_config (char * filename, int * process_count);
 
