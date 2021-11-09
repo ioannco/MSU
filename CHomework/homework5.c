@@ -144,6 +144,10 @@ struct config_node * read_config (char * filename, int * process_count)
         fclose (config_file);
         return NULL;
     }
+    else if (*process_count > 252)
+    {
+        printf ("config warning: process count is bigger than any possible key count. Error will be displayed.");
+    }
 
     while ((input = fgetc (config_file)) == ' ')
     {
