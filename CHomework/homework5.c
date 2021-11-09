@@ -155,7 +155,7 @@ struct config_node * read_config (char * filename, int * process_count)
     }
     else if (*process_count > 252)
     {
-        printf ("config warning: process count is bigger than any possible key count. Error will be displayed.");
+        printf ("config warning: process count is bigger than any possible key count. An error will be displayed.\n");
     }
 
     while ((input = fgetc (config_file)) == ' ')
@@ -196,7 +196,7 @@ struct config_node * read_config (char * filename, int * process_count)
             return NULL;
         }
 
-        if (input == '\n')
+        if (input == '\n' || input == EOF)
         {
             printf ("config error: (line %d) key is missing.\n", i + 2);
             fclose (config_file);
