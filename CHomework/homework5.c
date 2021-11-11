@@ -62,6 +62,15 @@ int fstrlen (int fd);
  */
 int skip_word (int fd);
 
+/**
+ * @brief Checks if character is delimiter
+ *
+ * @param c Character to check
+ *
+ * @return condition
+ */
+int is_delimiter (char c);
+
 /****************************************************************************************************************/
 
 int main (int argv, char ** argc)
@@ -176,7 +185,7 @@ struct config_node * read_config (char * filename, int * process_count)
     {
         int j = 0;
 
-        while ((input = fgetc(config_file)) == ' ')
+        while ((input = fgetc(config_file)) == ' ' || input == '\t')
         {
         }
         
@@ -206,7 +215,7 @@ struct config_node * read_config (char * filename, int * process_count)
 
         config[i].key = (char) input;
         
-        while ((input = fgetc(config_file)) == ' ')
+        while ((input = fgetc (config_file)) == ' ' || input == '\t')
         {
         }
 
@@ -276,16 +285,9 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
 
         if (buffer != config[my_proc_id].key)
         {
-            if (buffer != ' ' && buffer != ',' && buffer != '.')
+            if (!is_delimiter (buffer))
                 if (skip_word(fd))
                     break;
-            continue;
-        }
-
-        if (buffer == '*')
-        {
-            if (skip_word (fd))
-                break;
             continue;
         }
 
@@ -315,7 +317,6 @@ int process_text (char * filename, struct config_node * config, int my_proc_id)
             sprintf (replacement_buffer, "FATHER"); 
         }
 
-        
         assert (lseek (fd, word_start + word_length - strlen (replacement_buffer), SEEK_SET) != -1);
         assert (write (fd, replacement_buffer, strlen (replacement_buffer)) != -1);
     }
@@ -340,13 +341,14 @@ int fstrlen (int fd)
 
     while (read (fd, &buffer, 1) > 0)
     {
-        if (buffer == ' ' || buffer == ',' || buffer == '.')
+        if (is_delimiter (buffer))
             break;
 
         length++;
     }
 
     assert (lseek (fd, start_position, SEEK_SET) != -1);
+    
     return length;
 }
 
@@ -360,7 +362,7 @@ int skip_word (int fd)
 
     while (read (fd, &buffer, 1) > 0)
     {
-        if (buffer == ' ' || buffer == '.' || buffer == ',')
+        if (is_delimiter (buffer))
         {
             assert (lseek (fd, -1, SEEK_CUR) != -1);
             return 0;
@@ -368,4 +370,9 @@ int skip_word (int fd)
     }
 
     return 1;
+}
+
+int is_delimiter (char c)
+{
+    return c == ' ' || c == '.' || c == ',' || c == '\t' || c == '\n';
 }
