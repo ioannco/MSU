@@ -228,8 +228,7 @@ int run_host (pid_t * children, int child_count, int gates[2])
         }
         
         /** Waiting for an answer **/
-        if (!sig1_flag)
-            pause();
+        while (!sig1_flag && !child_flag);
 
         /** If an answer is SIGCHLD then continue requesting others **/
         if (child_flag)
@@ -264,8 +263,7 @@ int run_host (pid_t * children, int child_count, int gates[2])
         assert (write (gates[1], &msg, sizeof (struct message)) != -1);
 
         /** Waiting transaction to complete **/
-        if (!sig1_flag)
-            pause();
+        while (!sig1_flag && !child_flag);
 
         /** If an answer is SIGCHLD then continue requesting others **/
         if (child_flag)
@@ -318,8 +316,7 @@ int run_client (int child_index, int child_count, pid_t father_pid, int gates[2]
         if (logs) printf ("Waiting for the request..\n");
 
         /** Waiting for the request from host **/
-        if (!sig1_flag && !sig2_flag && !term_flag)
-            pause();
+        while (!sig1_flag && !sig2_flag && !term_flag);
     
         /** If a message was requested **/
         if (sig1_flag)
