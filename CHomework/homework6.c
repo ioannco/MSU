@@ -77,6 +77,8 @@ int main (int argv, char ** argc)
         printf ("Error while opening pipe: %s", strerror (errno));
     }
     
+    /*
+
     memset (&act, 0, sizeof (act));
     act.sa_handler = sig_handler;
 
@@ -86,12 +88,20 @@ int main (int argv, char ** argc)
     sigaddset (&set, SIGCHLD);
     sigaddset (&set, SIGTERM);
     
+
     act.sa_mask = set;
 
     sigaction (SIGUSR1, &act, 0);
     sigaction (SIGUSR2, &act, 0);
     sigaction (SIGCHLD, &act, 0);
     sigaction (SIGTERM, &act, 0);
+
+    */
+
+    signal (SIGUSR1, sig_handler);
+    signal (SIGUSR2, sig_handler);
+    signal (SIGTERM, sig_handler);
+    signal (SIGCHLD, sig_handler);
 
     for (i = child_count; i > 0; i--)
     {
@@ -159,7 +169,7 @@ int read_config (int child_index, int child_count, struct message * msg)
     config = fopen (filename, "r");
     if (!config)
     {
-        printf ("[%d]: File open failed.\n", getpid());
+        printf ("[%d]: (process #%d) File open failed.\n", getpid(), child_index + 1);
         return 1;
     }
 
@@ -170,14 +180,14 @@ int read_config (int child_index, int child_count, struct message * msg)
     if (fscanf (config, "%d", &(msg->dest)) != 1 || 
             ((input = fgetc (config)) != '\n'))
     {
-        printf ("[%d]: error (child #%d) Failed to read dest index\n", getpid(), child_index);
+        printf ("[%d]: error (process #%d) Failed to read dest index\n", getpid(), child_index + 1);
         fclose (config);
         return 1;
     }
 
     if (msg->dest > child_count || msg->dest < 1)
     {
-        printf ("[%d]: error (child #%d) Destination child is unreachable\n", getpid(), child_index);
+        printf ("[%d]: error (process #%d) Destination process (%d) is unreachable\n", getpid(), child_index + 1, msg->dest);
         fclose (config);
         return 1;
     }
@@ -223,23 +233,26 @@ int run_host (pid_t * children, int child_count, int gates[2])
         if (kill (children[i], SIGUSR1) == -1) 
         {
             DUMP_PID;
-            if (logs) printf ("Child %d is unavailable\n", i);
+            if (logs) printf ("Child %d with pid [%d] is unavailable\n", i, children[i]);
             continue;
         }
+
+        DUMP_PID;
+        if (logs) printf ("Waiting for an answer..\n");
         
         /** Waiting for an answer **/
-        while (!sig1_flag && !child_flag);
-
-        /** If an answer is SIGCHLD then continue requesting others **/
-        if (child_flag)
+        while (!sig1_flag && !sig2_flag)
         {
-            DUMP_PID;
-            if (logs) printf ("Seems like child %d has exited, continuing requesting others\n", i);
-
-            child_flag = 0;
-            continue;
         }
 
+        /** If child has denied my request **/
+        if (sig2_flag)
+        {
+            DUMP_PID;
+            if (logs) printf ("Child has denied my request, continue requesting others..\n");
+            sig2_flag = 0;
+            continue;
+        }
         sig1_flag = 0;
 
         /** Reading message **/
@@ -263,18 +276,7 @@ int run_host (pid_t * children, int child_count, int gates[2])
         assert (write (gates[1], &msg, sizeof (struct message)) != -1);
 
         /** Waiting transaction to complete **/
-        while (!sig1_flag && !child_flag);
-
-        /** If an answer is SIGCHLD then continue requesting others **/
-        if (child_flag)
-        {
-            DUMP_PID;
-            if (logs) printf ("Seems like child %d has exited, continuing requesting others\n", msg.dest);
-
-            child_flag = 0;
-            continue;
-        }
-
+        while (!sig1_flag);
         sig1_flag = 0;
 
         DUMP_PID;
@@ -302,13 +304,13 @@ int run_host (pid_t * children, int child_count, int gates[2])
 int run_client (int child_index, int child_count, pid_t father_pid, int gates[2])
 {
     struct message msg;
+    int config_failed = 0;
 
     DUMP_PID;
     if (logs) printf ("Reading config.\n");
 
     /** Reading process configuration file **/
-    if (read_config (child_index, child_count, &msg))
-        return 1;
+    config_failed = read_config (child_index, child_count, &msg);
 
     while (1)
     {
@@ -323,12 +325,27 @@ int run_client (int child_index, int child_count, pid_t father_pid, int gates[2]
         {
             sig1_flag = 0;
 
+            /** If there is no config **/
+            if (config_failed)
+            {
+                DUMP_PID;
+                if (logs) printf ("My config is broken, sending 404 signal to the father..\n");
+
+                /** Sending deny message **/
+                assert (kill (father_pid, SIGUSR2) != -1);
+
+                continue;
+            }
+
             DUMP_PID;
             if (logs) printf ("Sending message to the father. src = %d, dest = %d\n", msg.src, msg.dest);
 
             /** Sending message **/
             assert (write (gates[1], &msg, sizeof (struct message)) != -1);
             
+            DUMP_PID;
+            if (logs) printf ("Sending answer to the father\n");
+
             /** Sending answer signal **/
             assert (kill (father_pid, SIGUSR1) != -1);
         }
@@ -346,7 +363,7 @@ int run_client (int child_index, int child_count, pid_t father_pid, int gates[2]
             assert (read (gates[0], &recieved_msg, sizeof (struct message)) != -1);
             
             /** printing message **/
-            printf ("message from %d\n%s", recieved_msg.src, recieved_msg.str);
+            printf ("message from %d\n%s", recieved_msg.src + 1, recieved_msg.str);
 
             /** Sending transaction confirmation signal **/
             assert (kill (father_pid, SIGUSR1) != -1);
