@@ -219,7 +219,7 @@ struct config_node * read_config (char * filename, int * process_count)
         {
         }
 
-        if (input == '\n')
+        if (input == '\n' || input == EOF)
         {
             printf ("config error: (line %d) missing replacement to '%c' key.\n", i + 2, config[i].key);
             fclose (config_file);
@@ -228,6 +228,9 @@ struct config_node * read_config (char * filename, int * process_count)
         }
 
         config[i].replacement = (char) input;
+
+        
+        printf ("[%d]: input = %d\n", i,  input);
 
         for (j = 0; j < i; j++)
             if (config[i].key == config[j].key)
@@ -242,6 +245,9 @@ struct config_node * read_config (char * filename, int * process_count)
         {
         }
 
+        if (input == EOF)
+            break;
+
         if (input != '\n')
         {
             printf ("config error: (line %d) excess symbols.\n", i + 2);
@@ -249,6 +255,7 @@ struct config_node * read_config (char * filename, int * process_count)
             fclose (config_file);
             return NULL;    
         }
+
     }
     
     if (fgetc(config_file) != EOF)
