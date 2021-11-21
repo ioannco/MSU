@@ -39,8 +39,7 @@ int main (int argc, char ** argv)
             break;
     
         /** Processing input. If an error occured, exiting **/
-        if (!process (line))
-            break;
+        process (line);
     }
 
     free (line);
@@ -50,8 +49,28 @@ bool process (char * line)
 {
     pid_t child1_pid = -1, child2_pid = -1;
     int pipes[2] = {0, 0};    
-    
-    /** tobedone.. **/
+    char * next_line = line;
+
+    /** Searching for '|' character **/
+    next_line = strchr (line, '|');
+
+    /** If it's not found **/
+    if (!next_line)
+    {
+        /** Executing command **/
+        if (!system (line))
+            return true;
+
+        return false;
+    } 
+
+    next_line++;
+
+    if (*next_line == '|')
+    {
+        printf ("error: '||' is not allowed.\n");
+        return false;        
+    }
     
     return true;
 }
