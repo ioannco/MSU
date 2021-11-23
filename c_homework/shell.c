@@ -3,6 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 bool process (char * line);
 
@@ -47,19 +48,33 @@ int main (int argc, char ** argv)
 
 bool process (char * line)
 {
-    pid_t child1_pid = -1, child2_pid = -1;
-    int pipes[2] = {0, 0};    
+    int pipes[2] = {0, 0};
     char * next_line = line;
 
     /** Searching for '|' character **/
     next_line = strchr (line, '|');
 
+    /** Skipping delimiters **/
+    while (*line == ' ' || *line == '\t')
+        (*line)++;
+
     /** If it's not found **/
     if (!next_line)
     {
+        pid_t child_pid = fork();
+
+        if (child_pid > 0)
+        {
+            int i = 0;
+            const char ** args = NULL;
+            
+
+            for (i = 0; i)
+
+            execlp ("")
+        }
         /** Executing command **/
-        if (!system (line))
-            return true;
+
 
         return false;
     } 
