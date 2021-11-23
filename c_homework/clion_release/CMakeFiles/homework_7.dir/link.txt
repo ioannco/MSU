@@ -1,0 +1,3 @@
+C:\Users\Ivan\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\212.5080.54\bin\cmake\win\bin\cmake.exe -E rm -f CMakeFiles\homework_7.dir/objects.a
+C:\MinGW\bin\ar.exe cr CMakeFiles\homework_7.dir/objects.a @CMakeFiles\homework_7.dir\objects1.rsp
+C:\MinGW\bin\gcc.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\homework_7.dir/objects.a -Wl,--no-whole-archive -o homework_7.exe -Wl,--out-implib,libhomework_7.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\homework_7.dir\linklibs.rsp

@@ -23,7 +23,7 @@ struct config_node
  * @brief Reads config and generates config_node array
  *
  * @param filename Name of the config file
- * @param process_count Pointer to the process counter integer
+ * @param process_count Pointer to the run_pipeline counter integer
  *
  * @return Config AKA config_node array if sucess or NULL is there is an error
  */
@@ -32,7 +32,7 @@ struct config_node * read_config (char * filename, int * process_count);
 /**
  * @brief Processes text in conditions of homework 5 from moodle.cs.msu.ru group 217
  *
- * @param filename Name of the text file to process
+ * @param filename Name of the text file to run_pipeline
  * @param config Configuration of editor
  * @param my_proc_id Id of worker
  *
@@ -117,11 +117,11 @@ int main (int argv, char ** argc)
             {
                 if (child_pid > 0)
                 {
-                    printf ("[PID %d FATHER]: child process with PID %d successifully exited\n", getpid(), child_pid);
+                    printf ("[PID %d FATHER]: child run_pipeline with PID %d successifully exited\n", getpid(), child_pid);
                 }
                 else
                 {
-                    printf ("[PID %d FATHER]: error while waiting child process to exit.\n", getpid());
+                    printf ("[PID %d FATHER]: error while waiting child run_pipeline to exit.\n", getpid());
                     return 1; 
         
                 }   
@@ -151,20 +151,20 @@ struct config_node * read_config (char * filename, int * process_count)
     
     if (fscanf (config_file, "%d", process_count) != 1)
     {
-        printf ("config error: error while reading process count\n");
+        printf ("config error: error while reading run_pipeline count\n");
         fclose (config_file);
         return NULL;
     }
   
     if (*process_count < 1)
     {
-        printf("config error: process count is less than 1\n");
+        printf("config error: run_pipeline count is less than 1\n");
         fclose (config_file);
         return NULL;
     }
     else if (*process_count > 252)
     {
-        printf ("config warning: process count is bigger than any possible key count. An error will be displayed.\n");
+        printf ("config warning: run_pipeline count is bigger than any possible key count. An error will be displayed.\n");
     }
 
     while ((input = fgetc (config_file)) == ' ')

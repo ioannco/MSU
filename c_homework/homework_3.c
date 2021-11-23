@@ -228,7 +228,7 @@ int main (int argc, char ** argv)
 {
     char separator = 0;                     // string separator
     int command = -1;                       // user command
-    char * string = NULL;                   // string we need to process
+    char * string = NULL;                   // string we need to run_pipeline
     int N = -1;                             // delete count
     char ** string_array = NULL;            // string array
     unsigned int string_array_size = 0;     // string array size

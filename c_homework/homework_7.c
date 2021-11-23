@@ -45,12 +45,12 @@ int main (int argv, char ** argc)
         return 1;
     }
 
-    /** Reading process count from args and handling errors **/
+    /** Reading run_pipeline count from args and handling errors **/
     errno = 0;
     child_count = (int) strtol (argc[1], NULL, 10) - 1;
     if (errno)
     {
-        printf ("Error while reading process count: %s\n", strerror (errno));
+        printf ("Error while reading run_pipeline count: %s\n", strerror (errno));
         return 1;
     }
     else if (child_count < 0) 
@@ -169,7 +169,7 @@ int read_config (int child_index, int child_count, struct message * msg)
     config = fopen (filename, "r");
     if (!config)
     {
-        printf ("[%d]: (process #%d) File open failed.\n", getpid(), child_index + 1);
+        printf ("[%d]: (run_pipeline #%d) File open failed.\n", getpid(), child_index + 1);
         return 1;
     }
 
@@ -180,14 +180,14 @@ int read_config (int child_index, int child_count, struct message * msg)
     if (fscanf (config, "%d", &(msg->dest)) != 1 || 
             ((input = fgetc (config)) != '\n'))
     {
-        printf ("[%d]: error (process #%d) Failed to read dest index\n", getpid(), child_index + 1);
+        printf ("[%d]: error (run_pipeline #%d) Failed to read dest index\n", getpid(), child_index + 1);
         fclose (config);
         return 1;
     }
 
     if (msg->dest > child_count || msg->dest < 1)
     {
-        printf ("[%d]: error (process #%d) Destination process (%d) is unreachable\n", getpid(), child_index + 1, msg->dest);
+        printf ("[%d]: error (process #%d) Destination run_pipeline (%d) is unreachable\n", getpid(), child_index + 1, msg->dest);
         fclose (config);
         return 1;
     }
@@ -229,7 +229,7 @@ int run_host (pid_t * children, int child_count, int gates[2])
         DUMP_PID;
         if (logs) printf ("Requesting a message from child %d\n", i);
 
-        /** Sending request to the child. If process does not exist, continue requesting others **/
+        /** Sending request to the child. If run_pipeline does not exist, continue requesting others **/
         if (kill (children[i], SIGUSR1) == -1) 
         {
             DUMP_PID;
@@ -309,7 +309,7 @@ int run_client (int child_index, int child_count, pid_t father_pid, int gates[2]
     DUMP_PID;
     if (logs) printf ("Reading config.\n");
 
-    /** Reading process configuration file **/
+    /** Reading run_pipeline configuration file **/
     config_failed = read_config (child_index, child_count, &msg);
 
     while (1)
