@@ -1,8 +1,0 @@
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/homework_1.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/homework_2.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/rebuild_cache.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/homework_3.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/homework_6.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/shell.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/homework_7.dir
-//wsl$/Ubuntu/home/master/msu/c_homework/clion_debug/CMakeFiles/edit_cache.dir

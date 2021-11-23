@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/homework_6.dir/homework_6.c.o  -o homework_6  -lm 

@@ -1,8 +1,0 @@
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/edit_cache.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/shell.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/homework_7.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/homework_6.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/rebuild_cache.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/homework_3.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/homework_2.dir
-/home/master/msu/c_homework/clion_wsl_debug/CMakeFiles/homework_1.dir
