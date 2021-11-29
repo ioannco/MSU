@@ -1,4 +1,4 @@
 **/build
-**/cmake-build-debug
 **/debug
 **/release
+**/cmake-build*
