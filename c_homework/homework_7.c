@@ -363,7 +363,7 @@ int run_client (int child_index, int child_count, pid_t father_pid, int gates[2]
             assert (read (gates[0], &recieved_msg, sizeof (struct message)) != -1);
             
             /** printing message **/
-            printf ("message from %d\n%s", recieved_msg.src + 1, recieved_msg.str);
+            printf ("[%d]: message from %d\n%s", child_index + 1,  recieved_msg.src + 1, recieved_msg.str);
 
             /** Sending transaction confirmation signal **/
             assert (kill (father_pid, SIGUSR1) != -1);

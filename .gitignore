@@ -1,7 +1,4 @@
 **/build
-**/cmake-build-debug
 **/debug
 **/release
-**/clion_release
-**/clion_debug
-**/clion_wsl_debug
+**/cmake-build*
