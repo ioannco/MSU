@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <sys/wait.h>
+#include <ctype.h>
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -41,6 +42,7 @@ int execmd (char *script);
  * @return -1 uf an error occurred
  */
 int bash (char *command);
+
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -85,14 +87,14 @@ int main (int argc, char ** argv)
 bool run_pipeline (char *line)
 {
     int pipes[2];                              /* anonymous channel descriptors                        */
-    char *next_line = line;                    /* second pointer to the data we want to run_pipeline        */
+    char *next_line = line;                    /* second pointer to the data we want to run_pipeline   */
     pid_t elder_son = -1, younger_son = -1;    /* we need just two brothers to construct this pipeline */
 
     /* search for the first entry of separator */
     next_line = strchr (line, '|');
 
     /* skip unnecessary garbage */
-    while (*line == ' ' || *line == '\t')
+    while (isspace (*(line)))
         line++;
 
     /* if we are at the end of our pipeline */
@@ -105,14 +107,14 @@ bool run_pipeline (char *line)
         return true;
     }
 
-    /* replace | -> \0 to separate our commands */
+    /* replace '|' -> '\0' to separate our commands */
     *next_line = '\0';
     next_line++;
 
-    /* check if there are more than one delimiter */
-    if (*next_line == '|')
+    /* check if command is empty */
+    if (strlen (line) == 0)
     {
-        printf ("error: '||' is not allowed.\n");
+        printf ("error: empty command\n");
         return false;
     }
 
@@ -256,5 +258,4 @@ int bash (char *command)
         exit (0);
     }
 }
-
 
