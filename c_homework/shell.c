@@ -219,7 +219,7 @@ int execmd (char *script)
     args[arg_index] = (char *) NULL;
 
     /* calling our proxy */
-    __system_call__ (status = execvp (args[0], args));
+    status = execvp (args[0], args);
 
     /* (i don't really know if we can get here anyway...) */
 
@@ -250,8 +250,10 @@ int bash (char *command)
         int status = -1; /* something wrong, I can feel it   */
 
         /* what a pity, he replaced himself with an impostor */
-        __system_call__ (status = execmd (command));
-        return status; /*          reporting it...           */
+        status = execmd (command);
+
+        printf ("shell: %s: %s\n", command, strerror (errno));
+        exit (0);
     }
 }
 
