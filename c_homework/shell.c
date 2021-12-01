@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <sys/wait.h>
 #include <ctype.h>
+#include <dirent.h>
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -43,6 +44,29 @@ int execmd (char *script);
  */
 int bash (char *command);
 
+/**
+ * @brief check if command is "exit"
+ *
+ * @param str command to check
+ * @return true/false
+ */
+bool iscommand (const char *str, const char *command);
+
+/**
+ * @brief change directory
+ *
+ * @param path directory path
+ * @return success
+ */
+bool cd (const char * path);
+
+/**
+ * @brief run custom commands
+ *
+ * @param cmd command to intercept
+ * @return true if command was run
+ */
+bool override_cmd (const char * cmd);
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -69,7 +93,7 @@ int main (int argc, char ** argv)
         line[line_length - 1] = '\0';
 
         /* exit if user wants to */
-        if (!strcmp (line, "exit"))
+        if (iscommand (line, "exit"))
             break;
 
         /* emulate entered commands **/
@@ -86,9 +110,9 @@ int main (int argc, char ** argv)
 
 bool run_pipeline (char *line)
 {
-    int pipes[2];                              /* anonymous channel descriptors                        */
-    char *next_line = line;                    /* second pointer to the data we want to run_pipeline   */
-    pid_t elder_son = -1, younger_son = -1;    /* we need just two brothers to construct this pipeline */
+    int pipes[2];                             /* anonymous channel descriptors                        */
+    char *next_line = line;                   /* second pointer to the data we want to run_pipeline   */
+    pid_t elder_son = -1, younger_son = -1;   /* we need just two brothers to construct this pipeline */
 
     /* search for the first entry of separator */
     next_line = strchr (line, '|');
@@ -100,6 +124,13 @@ bool run_pipeline (char *line)
     /* if we are at the end of our pipeline */
     if (!next_line)
     {
+        /* check if command is empty */
+        if (strlen (line) == 0)
+        {
+            printf ("error: empty command\n");
+            return false;
+        }
+
         /* execute command */
         __shell__ (line);
 
@@ -168,6 +199,7 @@ bool run_pipeline (char *line)
 
 int execmd (char *script)
 {
+    int i = 0;
     int status = -1;                                          /* return value storage              */
     char *cmd = (char *) malloc (strlen (script) + 1);    /* copy of argument string to modify */
     char **args = (char **) malloc (sizeof (char *));         /* null-terminated string array      */
@@ -225,7 +257,9 @@ int execmd (char *script)
 
     /* (i don't really know if we can get here anyway...) */
 
+    free (args);
     free (cmd);
+
     return status; /* but at least i'll try */
 }
 
@@ -251,11 +285,55 @@ int bash (char *command)
     {
         int status = -1; /* something wrong, I can feel it   */
 
+        /* run custom command if exists */
+        if (override_cmd (command))
+            exit (0);
+
         /* what a pity, he replaced himself with an impostor */
         status = execmd (command);
 
-        printf ("shell: %s: %s\n", command, strerror (errno));
+        fprintf (stderr,"shell: %s: %s\n", command, strerror (errno));
+
         exit (0);
     }
 }
+
+bool iscommand (const char *str, const char *command)
+{
+    /* skipping spaces */
+    while (isspace (*str))
+        str++;
+
+    /* check if first word is command */
+    return (strstr (str, command) == str);
+}
+
+bool cd (const char *path)
+{
+    __system_call__ (chroot (path));
+
+    return 0;
+}
+
+bool override_cmd (const char *cmd)
+{
+    /* if command is cd */
+    if (iscommand (cmd, "cd"))
+    {
+        printf ("command is '%s'\n", cmd);
+
+        while (!isspace (*cmd))
+            cmd++;
+
+        while (isspace (*cmd))
+            cmd++;
+
+        cd (cmd);
+
+        return true;
+    }
+
+    return false;
+}
+
 
