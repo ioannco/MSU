@@ -131,6 +131,10 @@ bool run_pipeline (char *line)
             return false;
         }
 
+        /* run custom command if exists */
+        if (override_cmd (line))
+            return true;
+
         /* execute command */
         __shell__ (line);
 
@@ -155,27 +159,14 @@ bool run_pipeline (char *line)
 
     if (!elder_son) /* son's job */
     {
-        /* redirect stdin to pipe and close unused descriptors */
-        __system_call__ (dup2 (pipes[0], STDIN_FILENO))
-        __system_call__ (close (pipes[0]));;
-        __system_call__ (close (pipes[1]));
-
-        /* continue executing pipe */
-        run_pipeline (next_line);
-
-        /* son's bored */
-        exit (0);
-    }
-
-    /* very familiar trick innit? seems like someone is emulating his elder brother... */
-    __system_call__ (close(pipes[0]));                          /* close unused fd */
-    __system_call__ (younger_son = fork());
-
-    if (!younger_son) /* now youngling's turn */
-    {
         /*                   redirect stdout to writable end of our pipe               */
         __system_call__ (dup2 (pipes[1], STDOUT_FILENO));
         __system_call__ (close (pipes[1]));                        /* and close it */
+        __system_call__ (close (pipes[0]));
+
+        /* run custom command if exists */
+        if (override_cmd (line))
+            exit (0);
 
         /* executing command */
         __shell__ (line);
@@ -184,12 +175,30 @@ bool run_pipeline (char *line)
         exit(0);
     }
 
+    __system_call__ (waitpid(elder_son, NULL, 0));
+
+    /* very familiar trick innit? seems like someone is emulating his elder brother... */
+    __system_call__ (close(pipes[1]));                          /* close unused fd */
+    __system_call__ (younger_son = fork());
+
+    if (!younger_son) /* now youngling's turn */
+    {
+        /* redirect stdin to pipe and close unused descriptors */
+        __system_call__ (dup2 (pipes[0], STDIN_FILENO))
+        __system_call__ (close (pipes[0]));
+
+        /* continue executing pipe */
+        run_pipeline (next_line);
+
+        /* son's bored */
+        exit (0);
+    }
+
     /* finally, father can close last end of the pipe */
-    __system_call__ (close (pipes[1]));
+    __system_call__ (close (pipes[0]));
 
     /* oh, dear! seems like we've forgotten someone, shall we wait for them? */
     __system_call__ (waitpid(younger_son, NULL, 0));
-    __system_call__ (waitpid(elder_son, NULL, 0));
 
     /* report to the authorities */
     return true;
@@ -285,10 +294,6 @@ int bash (char *command)
     {
         int status = -1; /* something wrong, I can feel it   */
 
-        /* run custom command if exists */
-        if (override_cmd (command))
-            exit (0);
-
         /* what a pity, he replaced himself with an impostor */
         status = execmd (command);
 
@@ -317,18 +322,41 @@ bool cd (const char *path)
 
 bool override_cmd (const char *cmd)
 {
+    const char * arg_str = cmd; /* argument string */
+
+    /* pointer check */
+    assert (cmd);
+
+    /* skip cmd name and spacing */
+    while (!isspace (*arg_str))
+        arg_str++;
+    while (isspace (*arg_str))
+        arg_str++;
+
     /* if command is cd */
     if (iscommand (cmd, "cd"))
     {
-        printf ("command is '%s'\n", cmd);
+        DIR * current_dir = NULL;
 
-        while (!isspace (*cmd))
-            cmd++;
+        /* open current directory */
+        current_dir = opendir (cmd);
 
-        while (isspace (*cmd))
-            cmd++;
+        /* change directory */
+        __system_call__ (chdir (arg_str));
 
-        cd (cmd);
+        /* close current directory */
+        __system_call__ (closedir (current_dir));
+
+        return true;
+    }
+
+    /* if command is pwd */
+    if (iscommand (cmd, "pwd"))
+    {
+        char buffer[256] = "";
+
+        /* printing current working directory */
+        printf ("%s\n", getcwd (buffer, 256));
 
         return true;
     }
