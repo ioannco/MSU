@@ -53,14 +53,6 @@ int bash (char *command);
 bool iscommand (const char *str, const char *command);
 
 /**
- * @brief change directory
- *
- * @param path directory path
- * @return success
- */
-bool cd (const char * path);
-
-/**
  * @brief run custom commands
  *
  * @param cmd command to intercept
@@ -313,12 +305,6 @@ bool iscommand (const char *str, const char *command)
     return (strstr (str, command) == str);
 }
 
-bool cd (const char *path)
-{
-    __system_call__ (chroot (path));
-
-    return 0;
-}
 
 bool override_cmd (const char *cmd)
 {
