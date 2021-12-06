@@ -74,7 +74,7 @@ int pingpong_1 ()
     {
         msgrcv (msgid, &mes, sizeof (int), 2, 0);
 
-        mes.cnt++;
+        mes.cnt++;y
         mes.type = 1;
 
         msgsnd (msgid, &mes, sizeof (int), 0);
