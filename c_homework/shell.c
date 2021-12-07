@@ -8,6 +8,9 @@
 #include <sys/wait.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -16,6 +19,16 @@
 
 /* just macro for additional protection of bash function */
 #define __shell__(cmd)   __system_call__(bash(cmd))
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+enum redirect_mode
+{
+    R_WRITE,
+    R_READ,
+    R_APPEND,
+    R_ERROR
+};
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -60,6 +73,14 @@ bool iscommand (const char *str, const char *command);
  */
 bool override_cmd (const char * cmd);
 
+/**
+ * @brief run redirection command
+ *
+ * @param line command with redirection
+ * @return true or false
+ */
+bool run_redirection (char * line);
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int main (int argc, char ** argv)
@@ -89,7 +110,9 @@ int main (int argc, char ** argv)
             break;
 
         /* emulate entered commands **/
-        run_pipeline (line);
+        // run_pipeline (line);
+
+        run_redirection (line);
     }
 
     /* free memory */
@@ -348,6 +371,131 @@ bool override_cmd (const char *cmd)
     }
 
     return false;
+}
+
+bool run_redirection (char * line)
+{
+    char * filename = NULL, * strtok_output = NULL;
+    enum redirect_mode mode = -1;
+    int pipes[2];
+    int fd = -1;
+    int son_pid;
+    char * index = 0;
+
+    assert (line);
+
+    strtok_output = line;
+
+    while (*strtok_output != '\0')
+    {
+        filename = strtok_output;
+
+        strtok_output++;
+
+        while (*strtok_output != '<' && *strtok_output != '>' && *strtok_output != '\0')
+            strtok_output++;
+    }
+
+    if (filename == line)
+    {
+        /* check if command is empty */
+        if (strlen (line) == 0)
+        {
+            printf ("error: empty command\n");
+            return false;
+        }
+
+        /* run custom command if exists */
+        if (override_cmd (line))
+            return true;
+
+        /* execute command */
+        __shell__ (line);
+
+        /* exit from processor */
+        return true;
+    }
+
+    if (*filename == '>')
+    {
+        if (*(filename - 1) == '>')
+            mode = R_APPEND;
+        else if (*(filename - 1) == '2')
+            mode = R_ERROR;
+        else
+            mode = R_WRITE;
+    }
+    else
+        mode = R_READ;
+
+    *filename = '\0';
+    filename++;
+    while (isspace (*filename))
+        filename++;
+
+    index = filename;
+    while (!isspace (*index) && *index != '\0')
+        index++;
+
+    *index = '\0';
+
+    printf ("c = %d, line = '%s', name = '%s'\n", filename - line, line, filename);
+
+    switch (mode)
+    {
+        case R_READ:
+            fd = open (filename, O_RDONLY);
+            if (fd == -1)
+            {
+                fprintf (stderr, "Error while opening file: %s", strerror (errno));
+                return false;
+            }
+            break;
+
+        case R_WRITE:
+        case R_ERROR:
+            __system_call__ (fd = open (filename, O_WRONLY | O_CREAT));
+            break;
+
+        case R_APPEND:
+            __system_call__ (fd = open (filename, O_WRONLY | O_CREAT | O_APPEND));
+            break;
+
+        default:
+            break;
+    }
+
+    __system_call__ (son_pid = fork());
+
+    if (!son_pid)
+    {
+        switch (mode)
+        {
+            case R_READ:
+                __system_call__ (dup2 (fd, STDIN_FILENO));
+                break;
+
+            case R_WRITE:
+            case R_APPEND:
+            case R_ERROR:
+                __system_call__ (dup2 (fd, STDOUT_FILENO));
+                break;
+
+            default:
+                break;
+        }
+        __system_call__ (close (fd));
+
+        run_redirection (line);
+
+        exit (0);
+    }
+
+    __system_call__ (close (fd));
+
+    __system_call__ (waitpid (son_pid, NULL, 0));
+
+    return true;
 }
 
 
