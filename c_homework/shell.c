@@ -397,7 +397,7 @@ bool run_redirection (char * line)
             strtok_output++;
     }
 
-    if (filename == line)
+    if (filename == line || filename == line + 1)
     {
         /* check if command is empty */
         if (strlen (line) == 0)
@@ -443,24 +443,38 @@ bool run_redirection (char * line)
 
     *index = '\0';
 
+    if (!strlen(filename))
+    {
+        fprintf (stderr, "shell: error: invalid filename\n");
+        return false;
+    }
+
     switch (mode)
     {
         case R_READ:
             fd = open (filename, O_RDONLY);
             if (fd == -1)
             {
-                fprintf (stderr, "Error while opening file: %s", strerror (errno));
+                fprintf (stderr, "shell: error while opening file: %s", strerror (errno));
                 return false;
             }
             break;
 
         case R_WRITE:
         case R_ERROR:
-            __syscall__ (fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0664));
+            if ((fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0664)) == -1)
+            {
+                fprintf (stderr, "shell: error: '%s' while opening file '%s'\n", strerror (errno), filename);
+                return false;
+            }
             break;
 
         case R_APPEND:
-            __syscall__ (fd = open (filename, O_WRONLY | O_CREAT | O_APPEND, 0664));
+            if((fd = open (filename, O_WRONLY | O_CREAT | O_APPEND, 0664)) == -1)
+            {
+                fprintf (stderr, "shell: error: '%s' while opening file '%s'\n", strerror (errno), filename);
+                return false;
+            }
             break;
 
         default:
