@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -29,6 +30,13 @@ enum redirect_mode
     R_APPEND,
     R_ERROR
 };
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+pid_t running_child = 0;
+char * running_child_argv = "";
+bool sig_flag = false;
+int last_signal = 0;
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -81,6 +89,13 @@ bool override_cmd (const char * cmd);
  */
 bool run_redirection (char * line);
 
+/**
+ * @brief signal handler
+ *
+ * @param sig signal
+ */
+void sig_handler (int sig);
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int main (int argc, char ** argv)
@@ -89,14 +104,21 @@ int main (int argc, char ** argv)
     char *line = NULL;
     size_t line_length, line_size = 0;
 
+
     /* main cycle */
     while (true)
     {
         /* prompt welcome character */
         printf ("❯ ");
 
+        signal (SIGTSTP, SIG_DFL);
+        signal (SIGINT, SIG_DFL);
+
         /* get commands from stdin */
         __syscall__ (line_length = getline (&line, &line_size, stdin));
+
+        signal (SIGTSTP, sig_handler);
+        signal (SIGINT, sig_handler);
 
         /* skip if there is no info rather than \n */
         if (line_length == 1)
@@ -111,6 +133,7 @@ int main (int argc, char ** argv)
 
         /* emulate entered commands **/
         run_pipeline (line);
+
 
         }
 
@@ -169,7 +192,7 @@ bool run_pipeline (char *line)
 
     /* create anonymous channel and fork */
     __syscall__ (pipe (pipes));
-    __syscall__ (elder_son = fork ());
+    __syscall__ (running_child = elder_son = fork ());
 
     if (!elder_son) /* son's job */
     {
@@ -189,11 +212,9 @@ bool run_pipeline (char *line)
         exit(0);
     }
 
-    __syscall__ (waitpid(elder_son, NULL, 0));
-
     /* very familiar trick innit? seems like someone is emulating his elder brother... */
     __syscall__ (close(pipes[1]));                          /* close unused fd */
-    __syscall__ (younger_son = fork());
+    __syscall__ (running_child = younger_son = fork());
 
     if (!younger_son) /* now youngling's turn */
     {
@@ -213,6 +234,8 @@ bool run_pipeline (char *line)
 
     /* oh, dear! seems like we've forgotten someone, shall we wait for them? */
     __syscall__ (waitpid(younger_son, NULL, 0));
+    __syscall__ (waitpid(elder_son, NULL, 0));
+
 
     /* report to the authorities */
     return true;
@@ -292,20 +315,35 @@ int bash (char *command)
 {
     pid_t pid = -1; /* id of our little newborn process */
 
+
     /* childbirth */
-    __syscall__ (pid = fork ());
+    __syscall__ (running_child = pid = fork ());
+
+
+    sig_flag = false;
 
     /* if we identify ourselves as a father */
     if (pid > 0)
     {
         int status = -1; /* variable to store children exit code */
+        running_child_argv = command;
+
 
         /* wait for our newborn to die peacefully   */
-        __syscall__ (wait (&status));
+        waitpid(pid, &status, WUNTRACED);
+
+        if (sig_flag)
+        {
+            fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", pid, running_child_argv, last_signal == SIGINT ? "SIGINT" : "SIGTSTP");
+        }
+
+        running_child = 0;
+
         return status; /* and report if immediately */
     }
     else /* if we woke up in a newborn kamikadze terrorist baby-body... */
     {
+
         int status = -1; /* something wrong, I can feel it   */
 
         /* what a pity, he replaced himself with an impostor */
@@ -373,6 +411,8 @@ bool override_cmd (const char *cmd)
 
     return false;
 }
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 bool run_redirection (char * line)
 {
@@ -481,7 +521,7 @@ bool run_redirection (char * line)
             break;
     }
 
-    __syscall__ (son_pid = fork());
+    __syscall__ (running_child = son_pid = fork());
 
     if (!son_pid)
     {
@@ -514,4 +554,17 @@ bool run_redirection (char * line)
     __syscall__ (waitpid (son_pid, NULL, 0));
 
     return true;
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void sig_handler (int sig)
+{
+    if (!running_child)
+        return;
+
+    sig_flag = true;
+    last_signal = sig;
+
+    kill (running_child, sig);
 }
