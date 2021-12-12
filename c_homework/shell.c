@@ -1,4 +1,4 @@
-#include <stdio.h>                                                         /* SHELL: PIPELINE */
+#include <stdio.h>                          /* SHELL: PIPELINE */
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
@@ -15,10 +15,10 @@
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /* macro serves as protection of UNIX system calls and handlers for most of their errors */
-#define __system_call__(call)  if ((call) == -1) { fprintf (stderr, "'%s' while calling '%s' in function '%s'.\nLine #%d in file '%s'\n", strerror(errno), #call, __PRETTY_FUNCTION__, __LINE__, __FILE__); exit(errno); }
+#define __syscall__(call)  if ((call) == -1) { fprintf (stderr, "'%s' while calling '%s' in function '%s'.\nLine #%d in file '%s'\n", strerror(errno), #call, __PRETTY_FUNCTION__, __LINE__, __FILE__); exit(errno); }
 
 /* just macro for additional protection of bash function */
-#define __shell__(cmd)   __system_call__(bash(cmd))
+#define __shell__(cmd)   __syscall__(bash(cmd))
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -96,7 +96,7 @@ int main (int argc, char ** argv)
         printf ("❯ ");
 
         /* get commands from stdin */
-        __system_call__ (line_length = getline (&line, &line_size, stdin));
+        __syscall__ (line_length = getline (&line, &line_size, stdin));
 
         /* skip if there is no info rather than \n */
         if (line_length == 1)
@@ -110,10 +110,9 @@ int main (int argc, char ** argv)
             break;
 
         /* emulate entered commands **/
-        // run_pipeline (line);
+        run_pipeline (line);
 
-        run_redirection (line);
-    }
+        }
 
     /* free memory */
     free (line);
@@ -151,7 +150,7 @@ bool run_pipeline (char *line)
             return true;
 
         /* execute command */
-        __shell__ (line);
+        run_redirection (line);
 
         /* exit from processor */
         return true;
@@ -169,38 +168,38 @@ bool run_pipeline (char *line)
     }
 
     /* create anonymous channel and fork */
-    __system_call__ (pipe (pipes));
-    __system_call__ (elder_son = fork ());
+    __syscall__ (pipe (pipes));
+    __syscall__ (elder_son = fork ());
 
     if (!elder_son) /* son's job */
     {
         /*                   redirect stdout to writable end of our pipe               */
-        __system_call__ (dup2 (pipes[1], STDOUT_FILENO));
-        __system_call__ (close (pipes[1]));                        /* and close it */
-        __system_call__ (close (pipes[0]));
+        __syscall__ (dup2 (pipes[1], STDOUT_FILENO));
+        __syscall__ (close (pipes[1]));                        /* and close it */
+        __syscall__ (close (pipes[0]));
 
         /* run custom command if exists */
         if (override_cmd (line))
             exit (0);
 
         /* executing command */
-        __shell__ (line);
+        run_redirection (line);
 
         /* and now he's bored too */
         exit(0);
     }
 
-    __system_call__ (waitpid(elder_son, NULL, 0));
+    __syscall__ (waitpid(elder_son, NULL, 0));
 
     /* very familiar trick innit? seems like someone is emulating his elder brother... */
-    __system_call__ (close(pipes[1]));                          /* close unused fd */
-    __system_call__ (younger_son = fork());
+    __syscall__ (close(pipes[1]));                          /* close unused fd */
+    __syscall__ (younger_son = fork());
 
     if (!younger_son) /* now youngling's turn */
     {
         /* redirect stdin to pipe and close unused descriptors */
-        __system_call__ (dup2 (pipes[0], STDIN_FILENO))
-        __system_call__ (close (pipes[0]));
+        __syscall__ (dup2 (pipes[0], STDIN_FILENO))
+        __syscall__ (close (pipes[0]));
 
         /* continue executing pipe */
         run_pipeline (next_line);
@@ -210,10 +209,10 @@ bool run_pipeline (char *line)
     }
 
     /* finally, father can close last end of the pipe */
-    __system_call__ (close (pipes[0]));
+    __syscall__ (close (pipes[0]));
 
     /* oh, dear! seems like we've forgotten someone, shall we wait for them? */
-    __system_call__ (waitpid(younger_son, NULL, 0));
+    __syscall__ (waitpid(younger_son, NULL, 0));
 
     /* report to the authorities */
     return true;
@@ -235,7 +234,7 @@ int execmd (char *script)
     assert (cmd);
 
     /* calculate amount of memory we need to copy */
-    __system_call__ (cmd_size = (strlen (script) + 1));
+    __syscall__ (cmd_size = (strlen (script) + 1));
 
     /* allocate memory for our copy */
     cmd = (char *) malloc (cmd_size);
@@ -294,7 +293,7 @@ int bash (char *command)
     pid_t pid = -1; /* id of our little newborn process */
 
     /* childbirth */
-    __system_call__ (pid = fork ());
+    __syscall__ (pid = fork ());
 
     /* if we identify ourselves as a father */
     if (pid > 0)
@@ -302,7 +301,7 @@ int bash (char *command)
         int status = -1; /* variable to store children exit code */
 
         /* wait for our newborn to die peacefully   */
-        __system_call__ (wait (&status));
+        __syscall__ (wait (&status));
         return status; /* and report if immediately */
     }
     else /* if we woke up in a newborn kamikadze terrorist baby-body... */
@@ -333,28 +332,30 @@ bool override_cmd (const char *cmd)
 {
     const char * arg_str = cmd; /* argument string */
 
+
     /* pointer check */
     assert (cmd);
 
     /* skip cmd name and spacing */
-    while (!isspace (*arg_str))
+    while (!isspace (*arg_str) && *arg_str != '\0')
         arg_str++;
-    while (isspace (*arg_str))
+    while (isspace (*arg_str) && *arg_str != '\0')
         arg_str++;
+
 
     /* if command is cd */
     if (iscommand (cmd, "cd"))
     {
         DIR * current_dir = NULL;
 
-        /* open current directory */
-        current_dir = opendir (cmd);
-
-        /* change directory */
-        __system_call__ (chdir (arg_str));
-
-        /* close current directory */
-        __system_call__ (closedir (current_dir));
+        if (strlen (arg_str) == 0)
+        {
+            __syscall__ (chdir (getenv ("HOME")));
+        }
+        else
+        {
+            __syscall__ (chdir (arg_str));
+        }
 
         return true;
     }
@@ -428,7 +429,10 @@ bool run_redirection (char * line)
     else
         mode = R_READ;
 
+
     *filename = '\0';
+    if (mode == R_APPEND || mode == R_ERROR)
+        *(filename - 1) = '\0';
     filename++;
     while (isspace (*filename))
         filename++;
@@ -438,8 +442,6 @@ bool run_redirection (char * line)
         index++;
 
     *index = '\0';
-
-    printf ("c = %d, line = '%s', name = '%s'\n", filename - line, line, filename);
 
     switch (mode)
     {
@@ -454,48 +456,48 @@ bool run_redirection (char * line)
 
         case R_WRITE:
         case R_ERROR:
-            __system_call__ (fd = open (filename, O_WRONLY | O_CREAT));
+            __syscall__ (fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0664));
             break;
 
         case R_APPEND:
-            __system_call__ (fd = open (filename, O_WRONLY | O_CREAT | O_APPEND));
+            __syscall__ (fd = open (filename, O_WRONLY | O_CREAT | O_APPEND, 0664));
             break;
 
         default:
             break;
     }
 
-    __system_call__ (son_pid = fork());
+    __syscall__ (son_pid = fork());
 
     if (!son_pid)
     {
         switch (mode)
         {
             case R_READ:
-                __system_call__ (dup2 (fd, STDIN_FILENO));
+                __syscall__ (dup2 (fd, STDIN_FILENO));
                 break;
 
             case R_WRITE:
             case R_APPEND:
+                __syscall__ (dup2 (fd, STDOUT_FILENO));
+                break;
+
             case R_ERROR:
-                __system_call__ (dup2 (fd, STDOUT_FILENO));
+                __syscall__ (dup2 (fd, STDERR_FILENO));
                 break;
 
             default:
                 break;
         }
-        __system_call__ (close (fd));
+        __syscall__ (close (fd));
 
         run_redirection (line);
 
         exit (0);
     }
 
-    __system_call__ (close (fd));
-
-    __system_call__ (waitpid (son_pid, NULL, 0));
+    __syscall__ (close (fd));
+    __syscall__ (waitpid (son_pid, NULL, 0));
 
     return true;
 }
-
-

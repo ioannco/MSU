@@ -586,6 +586,7 @@ void ROL (char ** array, unsigned int start, unsigned int end)
         array[i] = array[i + 1];
 
     array[end] = buffer;
+
 }
 
 //===============================================================================================================
