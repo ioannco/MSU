@@ -50,7 +50,7 @@ bool run_pipeline (char *line);
 /**
  * @brief execute command line string
  *
- *  my little addition to UNIX's exec() function family
+ * my little addition to UNIX's exec() function family
  *
  * @param script string with special format: filename [arg1] [arg2] ...
  * @return -1 if an error occurred
@@ -96,6 +96,14 @@ bool run_redirection (char * line);
  */
 void sig_handler (int sig);
 
+/**
+ * @brief store command to the history
+ * @param cmd_array array of commands
+ * @param cmd_array_size size of the array
+ * @param cmd command to store
+ */
+void store_cmd (char ** cmd_array, int * cmd_array_size, char * cmd);
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int main (int argc, char ** argv)
@@ -103,6 +111,7 @@ int main (int argc, char ** argv)
     /* string to store command line and it's params */
     char *line = NULL;
     size_t line_length, line_size = 0;
+
 
 
     /* main cycle */
@@ -567,4 +576,14 @@ void sig_handler (int sig)
     last_signal = sig;
 
     kill (running_child, sig);
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void store_cmd (char **cmd_array, int *cmd_array_size, char *cmd)
+{
+    (*cmd_array_size)++;
+    cmd_array = realloc (cmd_array, *cmd_array_size);
+
+    cmd_array[*cmd_array_size - 1] = cmd;
 }
