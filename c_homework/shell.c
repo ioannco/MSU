@@ -37,6 +37,12 @@ struct history_struct
     size_t size;
 } history;
 
+struct screening_map_struct
+{
+    char ** positions;
+    size_t size;
+} screens;
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 pid_t running_child = 0;
@@ -125,6 +131,14 @@ void free_history ();
  */
 size_t count_digits (size_t number);
 
+/**
+ * @clear line after '#' sign
+ * @param line line to clear
+ */
+void clear_comments (char * line);
+
+char * screen_line (char * line);
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int main (int argc, char ** argv)
@@ -134,6 +148,9 @@ int main (int argc, char ** argv)
     size_t line_length, line_size = 0;
 
     init_history();
+
+    screens.size = 0;
+    screens.positions = NULL;
 
     /* main cycle */
     while (true)
@@ -151,12 +168,15 @@ int main (int argc, char ** argv)
         signal (SIGINT, sig_handler);
 
 
-        /* skip if there is no info rather than \n */
-        if (line_length == 1)
-            continue;
-
         /* erase \n - we don't really need it */
         line[line_length - 1] = '\0';
+
+        line = screen_line (line);
+
+        clear_comments (line);
+
+        if (strlen (line) == 0)
+            continue;
 
         store_command (line);
 
@@ -166,7 +186,6 @@ int main (int argc, char ** argv)
 
         /* emulate entered commands **/
         run_pipeline (line);
-
     }
 
     free (line);
@@ -665,4 +684,53 @@ size_t count_digits (size_t number)
     }
 
     return count;
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void clear_comments (char *line)
+{
+    char * comment = strchr (line, '#');
+
+    if (!comment)
+        return;
+
+    *comment = '\0';
+}
+
+char *screen_line (char *line_in)
+{
+    size_t new_i = 0, scr_i = 0;
+    char * line = line_in;
+    char * new = malloc (strlen (line) + 1);
+
+    screens.size = strlen (line);
+    screens.positions = realloc (screens.positions, screens.size * sizeof (char*));
+
+    while (*line != '\0')
+    {
+        if (*line == '\\')
+        {
+            line++;
+
+            new[new_i] = *line;
+            screens.positions[scr_i++] = &new[new_i++];
+        }
+        else
+        {
+            new[new_i++] = *line;
+        }
+
+        line++;
+    }
+    new[new_i] = '\0';
+
+    screens.size = scr_i;
+    screens.positions = realloc (screens.positions, screens.size * sizeof (char*));
+
+    for (int i = 0; i < screens.size; i++)
+        printf ("%c", *screens.positions[i]);
+
+    free (line_in);
+    return new;
 }
