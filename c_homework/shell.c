@@ -31,6 +31,12 @@ enum redirect_mode
     R_ERROR
 };
 
+struct history_struct
+{
+    char ** commands;
+    size_t size;
+} history;
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 pid_t running_child = 0;
@@ -97,12 +103,27 @@ bool run_redirection (char * line);
 void sig_handler (int sig);
 
 /**
- * @brief store command to the history
- * @param cmd_array array of commands
- * @param cmd_array_size size of the array
- * @param cmd command to store
+ * @brief initializes the history structure
  */
-void store_cmd (char ** cmd_array, int * cmd_array_size, char * cmd);
+void init_history ();
+
+/**
+ * @brief add command to the history
+ * @param cmd command
+ */
+void store_command (char * cmd);
+
+/*
+ * @brief free history structure
+ */
+void free_history ();
+
+/**
+ * @brief counts digits in a number
+ * @param number number
+ * @return digits count
+ */
+size_t count_digits (size_t number);
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -112,13 +133,13 @@ int main (int argc, char ** argv)
     char *line = NULL;
     size_t line_length, line_size = 0;
 
-
+    init_history();
 
     /* main cycle */
     while (true)
     {
         /* prompt welcome character */
-        printf ("❯ ");
+        printf ("@ ");
 
         signal (SIGTSTP, SIG_DFL);
         signal (SIGINT, SIG_DFL);
@@ -129,12 +150,15 @@ int main (int argc, char ** argv)
         signal (SIGTSTP, sig_handler);
         signal (SIGINT, sig_handler);
 
+
         /* skip if there is no info rather than \n */
         if (line_length == 1)
             continue;
 
         /* erase \n - we don't really need it */
         line[line_length - 1] = '\0';
+
+        store_command (line);
 
         /* exit if user wants to */
         if (iscommand (line, "exit"))
@@ -143,11 +167,10 @@ int main (int argc, char ** argv)
         /* emulate entered commands **/
         run_pipeline (line);
 
+    }
 
-        }
-
-    /* free memory */
     free (line);
+    free_history();
 
     return 0;
 }
@@ -176,10 +199,6 @@ bool run_pipeline (char *line)
             printf ("error: empty command\n");
             return false;
         }
-
-        /* run custom command if exists */
-        if (override_cmd (line))
-            return true;
 
         /* execute command */
         run_redirection (line);
@@ -210,9 +229,7 @@ bool run_pipeline (char *line)
         __syscall__ (close (pipes[1]));                        /* and close it */
         __syscall__ (close (pipes[0]));
 
-        /* run custom command if exists */
-        if (override_cmd (line))
-            exit (0);
+
 
         /* executing command */
         run_redirection (line);
@@ -377,7 +394,7 @@ bool iscommand (const char *str, const char *command)
 
 bool override_cmd (const char *cmd)
 {
-    const char * arg_str = cmd; /* argument string */
+    const char *arg_str = cmd; /* argument string */
 
 
     /* pointer check */
@@ -393,7 +410,7 @@ bool override_cmd (const char *cmd)
     /* if command is cd */
     if (iscommand (cmd, "cd"))
     {
-        DIR * current_dir = NULL;
+        DIR *current_dir = NULL;
 
         if (strlen (arg_str) == 0)
         {
@@ -408,12 +425,39 @@ bool override_cmd (const char *cmd)
     }
 
     /* if command is pwd */
-    if (iscommand (cmd, "pwd"))
+    else if (iscommand (cmd, "pwd"))
     {
         char buffer[256] = "";
 
         /* printing current working directory */
         printf ("%s\n", getcwd (buffer, 256));
+
+        return true;
+    }
+
+    else if (iscommand (cmd, "history"))
+    {
+        size_t index = 0u;
+
+        if (strlen (arg_str) == 0)
+        {
+            size_t digits_count = 0;
+
+            size_t i = 0;
+            for (i; i < history.size; i++)
+                printf("%*lu  %s\n",(int) -count_digits (history.size), i, history.commands[i]);
+
+            return true;
+        }
+
+        if (sscanf (arg_str, "%lu", &index) != 1 || index >= history.size || index < 0)
+        {
+            fprintf (stderr, "shell: history: invalid argument '%s'\n", arg_str);
+            return true;
+        }
+
+        run_pipeline (history.commands[index]);
+        store_command (history.commands[index]);
 
         return true;
     }
@@ -580,10 +624,45 @@ void sig_handler (int sig)
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-void store_cmd (char **cmd_array, int *cmd_array_size, char *cmd)
+void init_history ()
 {
-    (*cmd_array_size)++;
-    cmd_array = realloc (cmd_array, *cmd_array_size);
+    history.size = 0u;
+    history.commands = NULL;
+}
 
-    cmd_array[*cmd_array_size - 1] = cmd;
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void store_command (char *cmd)
+{
+    history.size++;
+    history.commands = realloc (history.commands, history.size * sizeof (char *));
+    history.commands[history.size - 1] = (char *) malloc (strlen (cmd) + 1);
+    strcpy (history.commands[history.size - 1], cmd);
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+void free_history ()
+{
+    size_t i = 0;
+
+    for (i = 0; i < history.size; i++)
+    {
+        free (history.commands[i]);
+        history.commands[i] = NULL;
+    }
+}
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+size_t count_digits (size_t number)
+{
+    size_t count = 0;
+    while (number)
+    {
+        number /= 10;
+        count++;
+    }
+
+    return count;
 }
