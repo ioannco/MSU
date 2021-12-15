@@ -50,6 +50,8 @@ char * running_child_argv = "";
 bool sig_flag = false;
 int last_signal = 0;
 
+char * allocated_string = NULL;
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /**
@@ -180,6 +182,8 @@ int main (int argc, char ** argv)
 
         store_command (line);
 
+        allocated_string = line;
+
         /* exit if user wants to */
         if (iscommand (line, "exit"))
             break;
@@ -305,7 +309,7 @@ int execmd (char *script)
     __syscall__ (cmd_size = (strlen (script) + 1));
 
     /* allocate memory for our copy */
-    cmd = (char *) malloc (cmd_size);
+    cmd = (char *) realloc (cmd, cmd_size);
     assert (cmd); /* integrity check*/
 
     /* calling dude from that old copy center */
@@ -350,6 +354,7 @@ int execmd (char *script)
 
     free (args);
     free (cmd);
+
 
     return status; /* but at least i'll try */
 }
