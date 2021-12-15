@@ -139,7 +139,14 @@ size_t count_digits (size_t number);
  */
 void clear_comments (char * line);
 
+/**
+ * @brief modify line, delete screenings and return new line
+ * @param line
+ * @return
+ */
 char * screen_line (char * line);
+
+bool is_screened (char * char_ptr);
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -208,6 +215,8 @@ bool run_pipeline (char *line)
 
     /* search for the first entry of separator */
     next_line = strchr (line, '|');
+    while (next_line && is_screened (next_line))
+        next_line = strchr (++next_line, '|');
 
     /* skip unnecessary garbage */
     while (isspace (*(line)))
@@ -733,9 +742,16 @@ char *screen_line (char *line_in)
     screens.size = scr_i;
     screens.positions = realloc (screens.positions, screens.size * sizeof (char*));
 
-    for (int i = 0; i < screens.size; i++)
-        printf ("%c", *screens.positions[i]);
-
     free (line_in);
     return new;
+}
+
+bool is_screened (char *char_ptr)
+{
+    size_t i = 0;
+    for (i; i < screens.size; i++)
+        if (screens.positions[i] == char_ptr)
+            return true;
+
+    return false;
 }
