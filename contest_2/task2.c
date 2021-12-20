@@ -7,6 +7,14 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+int flg = 0;
+
+void handler (int sig)
+{
+    flg = 1;
+}
+
+
 int main(int argc, char ** argv)
 {
     pid_t pid = -1;
@@ -16,6 +24,8 @@ int main(int argc, char ** argv)
 
     pipe (pipes);
     pid = fork ();
+
+    signal (SIGUSR1, handler);
 
     if (pid)
     {
@@ -34,7 +44,7 @@ int main(int argc, char ** argv)
 
             write (pipes[1], nums, sizeof (int) * 20);
 
-            while (!flag);
+            while (!flg);
 
             read (pipes[0], nums, sizeof (int) * 20);
             write (fd2, nums, sizeof (int) * 20);
@@ -58,6 +68,7 @@ int main(int argc, char ** argv)
                     nums[i] = 0;
 
             write (pipes[1], nums, sizeof (int) * 20);
+            kill (SIGUSR1, getppid());
         }
     }
 
