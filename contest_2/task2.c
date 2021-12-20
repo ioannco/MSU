@@ -34,14 +34,6 @@ int main(int argc, char ** argv)
 
         while (read (fd1, nums, sizeof (int) * 20) > 0)
         {
-            close (pipes[0]);
-            close (pipes[1]);
-            close (fd1);
-            close (fd2);
-            kill (pid, SIGINT);
-            wait (NULL);
-            return 0;
-
             write (pipes[1], nums, sizeof (int) * 20);
 
             while (!flg);
@@ -51,6 +43,14 @@ int main(int argc, char ** argv)
             write (fd2, nums, sizeof (int) * 20);
 
         }
+
+        close (pipes[0]);
+        close (pipes[1]);
+        close (fd1);
+        close (fd2);
+        kill (pid, SIGINT);
+        wait (NULL);
+        return 0;
     }
     else
     {
