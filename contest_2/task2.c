@@ -45,6 +45,7 @@ int main(int argc, char ** argv)
             write (pipes[1], nums, sizeof (int) * 20);
 
             while (!flg);
+            flg = 0;
 
             read (pipes[0], nums, sizeof (int) * 20);
             write (fd2, nums, sizeof (int) * 20);
