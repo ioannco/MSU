@@ -74,6 +74,9 @@ int main (int argc, char ** argv)
             // читаем индекс из канала
             read (pipes[0], &i, sizeof (int));
 
+            // печатаем индекс
+            printf ("father %d\n", i);
+
             // если индекс вышел за границы
             if (i < 0)
             {
@@ -89,9 +92,6 @@ int main (int argc, char ** argv)
 
                 break;
             }
-
-            // печатаем индекс
-            printf ("father %d\n", i);
 
             // сбрасываем буфер (хз зачем)
             fflush (stdout);
