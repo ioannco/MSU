@@ -31,12 +31,22 @@ enum redirect_mode
     R_ERROR
 };
 
+struct stopped_proc_info
+{
+    pid_t pid;
+    char argv[256];
+};
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 pid_t running_child = 0;
 char * running_child_argv = "";
 bool sig_flag = false;
 int last_signal = 0;
+struct stopped_proc_info stopped_proc[1000];
+size_t stopped_proc_size = 0;
+int pid_pipes[2];
+int last_changed_i = -1;
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -96,6 +106,23 @@ bool run_redirection (char * line);
  */
 void sig_handler (int sig);
 
+void usr_handler (int sig);
+void father_usr_handler (int sig);
+void int_handler (int sig);
+
+char get_proc_state (pid_t pid);
+
+void check_changed_processes ()
+{
+    int i = 0;
+
+    for (i; i < stopped_proc_size; i++)
+    {
+        if (get_proc_state (stopped_proc[i].pid) != 'T')
+            last_changed_i = i;
+    }
+}
+
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int main (int argc, char ** argv)
@@ -104,15 +131,18 @@ int main (int argc, char ** argv)
     char *line = NULL;
     size_t line_length, line_size = 0;
 
+    signal (SIGUSR1, father_usr_handler);
+    __syscall__(pipe (pid_pipes));
 
     /* main cycle */
     while (true)
     {
         /* prompt welcome character */
+        check_changed_processes();
         printf ("❯ ");
 
-        signal (SIGTSTP, SIG_DFL);
-        signal (SIGINT, SIG_DFL);
+        signal (SIGTSTP, int_handler);
+        signal (SIGINT, int_handler);
 
         /* get commands from stdin */
         __syscall__ (line_length = getline (&line, &line_size, stdin));
@@ -135,7 +165,7 @@ int main (int argc, char ** argv)
         run_pipeline (line);
 
 
-        }
+    }
 
     /* free memory */
     free (line);
@@ -328,12 +358,20 @@ int bash (char *command)
         int status = -1; /* variable to store children exit code */
         running_child_argv = command;
 
-
         /* wait for our newborn to die peacefully   */
         waitpid(pid, &status, WUNTRACED);
 
         if (sig_flag)
         {
+            if (last_signal == SIGTSTP)
+            {
+                struct stopped_proc_info procinfo = {pid, ""};
+                strcpy (procinfo.argv, running_child_argv);
+
+                write (pid_pipes[1], &procinfo, sizeof (struct stopped_proc_info));
+                raise (SIGUSR1);
+            }
+
             fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", pid, running_child_argv, last_signal == SIGINT ? "SIGINT" : "SIGTSTP");
         }
 
@@ -343,6 +381,7 @@ int bash (char *command)
     }
     else /* if we woke up in a newborn kamikadze terrorist baby-body... */
     {
+        signal (SIGUSR1, usr_handler);
 
         int status = -1; /* something wrong, I can feel it   */
 
@@ -567,4 +606,72 @@ void sig_handler (int sig)
     last_signal = sig;
 
     kill (running_child, sig);
+
+}
+
+void usr_handler (int sig)
+{
+    kill (getppid(), SIGUSR1);
+
+}
+
+void father_usr_handler (int sig)
+{
+    struct stopped_proc_info procinfo = {0, ""};
+    int i = 0;
+    read (pid_pipes[0], &procinfo, sizeof (struct stopped_proc_info));
+
+    for (; i < stopped_proc_size; i++)
+    {
+        if (stopped_proc[i].pid == 0)
+        {
+            stopped_proc[i] = procinfo;
+            return;
+        }
+    }
+
+    stopped_proc[stopped_proc_size++] = procinfo;
+}
+
+void int_handler (int sig)
+{
+    if (last_changed_i == -1)
+    {
+        if (sig == SIGTSTP)
+        {
+            signal (SIGTSTP, SIG_DFL);
+            raise (SIGTSTP);
+            return;
+        }
+        else
+            exit(0);
+    }
+
+    fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", stopped_proc[last_changed_i].pid, stopped_proc[last_changed_i].argv, sig == SIGINT ? "SIGINT" : "SIGTSTP");
+    printf ("❯ ");
+    fflush (stdout);
+
+    if (get_proc_state (stopped_proc[last_changed_i].pid) != 'T')
+        stopped_proc[last_changed_i].pid = 0;
+
+    last_changed_i = -1;
+}
+
+char get_proc_state (pid_t pid)
+{
+    char buffer[32];
+    FILE * stat = NULL;
+    char state = 0;
+
+    if (pid == 0)
+        return true;
+
+    sprintf (buffer, "/proc/%d/stat", pid);
+    stat = fopen (buffer, "r");
+
+    fscanf (stat, "%s %s %c", buffer, buffer, &state);
+    fclose (stat);
+
+    return state;
+
 }
