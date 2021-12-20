@@ -40,13 +40,14 @@ struct stopped_proc_info
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 pid_t running_child = 0;
-char * running_child_argv = "";
+char *running_child_argv = "";
 bool sig_flag = false;
 int last_signal = 0;
 struct stopped_proc_info stopped_proc[1000];
 size_t stopped_proc_size = 0;
 int pid_pipes[2];
 int last_changed_i = -1;
+int father_pid = 0;
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -89,7 +90,7 @@ bool iscommand (const char *str, const char *command);
  * @param cmd command to intercept
  * @return true if command was run
  */
-bool override_cmd (const char * cmd);
+bool override_cmd (const char *cmd);
 
 /**
  * @brief run redirection command
@@ -97,7 +98,7 @@ bool override_cmd (const char * cmd);
  * @param line command with redirection
  * @return true or false
  */
-bool run_redirection (char * line);
+bool run_redirection (char *line);
 
 /**
  * @brief signal handler
@@ -107,7 +108,9 @@ bool run_redirection (char * line);
 void sig_handler (int sig);
 
 void usr_handler (int sig);
+
 void father_usr_handler (int sig);
+
 void int_handler (int sig);
 
 char get_proc_state (pid_t pid);
@@ -125,7 +128,7 @@ void check_changed_processes ()
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-int main (int argc, char ** argv)
+int main (int argc, char **argv)
 {
     /* string to store command line and it's params */
     char *line = NULL;
@@ -134,11 +137,13 @@ int main (int argc, char ** argv)
     signal (SIGUSR1, father_usr_handler);
     __syscall__(pipe (pid_pipes));
 
+    father_pid = getpid();
+
     /* main cycle */
     while (true)
     {
         /* prompt welcome character */
-        check_changed_processes();
+        check_changed_processes ();
         printf ("❯ ");
 
         signal (SIGTSTP, int_handler);
@@ -180,6 +185,7 @@ bool run_pipeline (char *line)
     int pipes[2];                             /* anonymous channel descriptors                        */
     char *next_line = line;                   /* second pointer to the data we want to run_pipeline   */
     pid_t elder_son = -1, younger_son = -1;   /* we need just two brothers to construct this pipeline */
+
 
     /* search for the first entry of separator */
     next_line = strchr (line, '|');
@@ -239,12 +245,12 @@ bool run_pipeline (char *line)
         run_redirection (line);
 
         /* and now he's bored too */
-        exit(0);
+        exit (0);
     }
 
     /* very familiar trick innit? seems like someone is emulating his elder brother... */
-    __syscall__ (close(pipes[1]));                          /* close unused fd */
-    __syscall__ (running_child = younger_son = fork());
+    __syscall__ (close (pipes[1]));                          /* close unused fd */
+    __syscall__ (running_child = younger_son = fork ());
 
     if (!younger_son) /* now youngling's turn */
     {
@@ -263,8 +269,8 @@ bool run_pipeline (char *line)
     __syscall__ (close (pipes[0]));
 
     /* oh, dear! seems like we've forgotten someone, shall we wait for them? */
-    __syscall__ (waitpid(younger_son, NULL, 0));
-    __syscall__ (waitpid(elder_son, NULL, 0));
+    __syscall__ (waitpid (younger_son, NULL, 0));
+    __syscall__ (waitpid (elder_son, NULL, 0));
 
 
     /* report to the authorities */
@@ -359,7 +365,7 @@ int bash (char *command)
         running_child_argv = command;
 
         /* wait for our newborn to die peacefully   */
-        waitpid(pid, &status, WUNTRACED);
+        waitpid (pid, &status, WUNTRACED);
 
         if (sig_flag)
         {
@@ -369,10 +375,11 @@ int bash (char *command)
                 strcpy (procinfo.argv, running_child_argv);
 
                 write (pid_pipes[1], &procinfo, sizeof (struct stopped_proc_info));
-                raise (SIGUSR1);
+                kill (father_pid, SIGUSR1);
             }
 
-            fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", pid, running_child_argv, last_signal == SIGINT ? "SIGINT" : "SIGTSTP");
+            fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", pid, running_child_argv,
+                     last_signal == SIGINT ? "SIGINT" : "SIGTSTP");
         }
 
         running_child = 0;
@@ -381,14 +388,13 @@ int bash (char *command)
     }
     else /* if we woke up in a newborn kamikadze terrorist baby-body... */
     {
-        signal (SIGUSR1, usr_handler);
 
         int status = -1; /* something wrong, I can feel it   */
 
         /* what a pity, he replaced himself with an impostor */
         status = execmd (command);
 
-        fprintf (stderr,"shell: %s: %s\n", command, strerror (errno));
+        fprintf (stderr, "shell: %s: %s\n", command, strerror (errno));
 
         exit (0);
     }
@@ -407,7 +413,7 @@ bool iscommand (const char *str, const char *command)
 
 bool override_cmd (const char *cmd)
 {
-    const char * arg_str = cmd; /* argument string */
+    const char *arg_str = cmd; /* argument string */
 
 
     /* pointer check */
@@ -423,7 +429,7 @@ bool override_cmd (const char *cmd)
     /* if command is cd */
     if (iscommand (cmd, "cd"))
     {
-        DIR * current_dir = NULL;
+        DIR *current_dir = NULL;
 
         if (strlen (arg_str) == 0)
         {
@@ -453,14 +459,14 @@ bool override_cmd (const char *cmd)
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-bool run_redirection (char * line)
+bool run_redirection (char *line)
 {
-    char * filename = NULL, * strtok_output = NULL;
+    char *filename = NULL, *strtok_output = NULL;
     enum redirect_mode mode = -1;
     int pipes[2];
     int fd = -1;
     int son_pid;
-    char * index = 0;
+    char *index = 0;
 
     assert (line);
 
@@ -522,7 +528,7 @@ bool run_redirection (char * line)
 
     *index = '\0';
 
-    if (!strlen(filename))
+    if (!strlen (filename))
     {
         fprintf (stderr, "shell: error: invalid filename\n");
         return false;
@@ -549,7 +555,7 @@ bool run_redirection (char * line)
             break;
 
         case R_APPEND:
-            if((fd = open (filename, O_WRONLY | O_CREAT | O_APPEND, 0664)) == -1)
+            if ((fd = open (filename, O_WRONLY | O_CREAT | O_APPEND, 0664)) == -1)
             {
                 fprintf (stderr, "shell: error: '%s' while opening file '%s'\n", strerror (errno), filename);
                 return false;
@@ -560,7 +566,7 @@ bool run_redirection (char * line)
             break;
     }
 
-    __syscall__ (running_child = son_pid = fork());
+    __syscall__ (running_child = son_pid = fork ());
 
     if (!son_pid)
     {
@@ -609,12 +615,6 @@ void sig_handler (int sig)
 
 }
 
-void usr_handler (int sig)
-{
-    kill (getppid(), SIGUSR1);
-
-}
-
 void father_usr_handler (int sig)
 {
     struct stopped_proc_info procinfo = {0, ""};
@@ -635,8 +635,33 @@ void father_usr_handler (int sig)
 
 void int_handler (int sig)
 {
+    int i = 0;
+
+
+    for (; i < stopped_proc_size; i++)
+    {
+        if (stopped_proc[i].pid == 0)
+            continue;
+
+        if (get_proc_state (stopped_proc[i].pid) != 'T')
+        {
+            kill (sig, stopped_proc[i].pid);
+            fprintf (stderr, "shell: process with pid %d and argv %s received %s\n",
+                     stopped_proc[last_changed_i].pid, stopped_proc[last_changed_i].argv,
+                     sig == SIGINT ? "SIGINT" : "SIGTSTP");
+
+            printf ("❯ ");
+
+            if (sig == SIGINT)
+                stopped_proc[i].pid = 0;
+
+            return;
+        }
+    }
+
     if (last_changed_i == -1)
     {
+
         if (sig == SIGTSTP)
         {
             signal (SIGTSTP, SIG_DFL);
@@ -644,10 +669,11 @@ void int_handler (int sig)
             return;
         }
         else
-            exit(0);
+            exit (0);
     }
 
-    fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", stopped_proc[last_changed_i].pid, stopped_proc[last_changed_i].argv, sig == SIGINT ? "SIGINT" : "SIGTSTP");
+    fprintf (stderr, "shell: process with pid %d and argv %s received %s\n", stopped_proc[last_changed_i].pid,
+             stopped_proc[last_changed_i].argv, sig == SIGINT ? "SIGINT" : "SIGTSTP");
     printf ("❯ ");
     fflush (stdout);
 
@@ -660,7 +686,7 @@ void int_handler (int sig)
 char get_proc_state (pid_t pid)
 {
     char buffer[32];
-    FILE * stat = NULL;
+    FILE *stat = NULL;
     char state = 0;
 
     if (pid == 0)
