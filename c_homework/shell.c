@@ -655,6 +655,8 @@ void int_handler (int sig)
             if (sig == SIGINT)
                 stopped_proc[i].pid = 0;
 
+            last_changed_i = -1;
+
             return;
         }
     }
