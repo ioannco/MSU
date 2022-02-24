@@ -11,26 +11,14 @@ class Quotient
     explicit Quotient (int dividend = 0, int divisor = 1);
     void print () const;
 
-    protected:
+    private:
 
-    static int gcd(int a, unsigned b);
+    static int gcd(int a, int b);
 
     int m_dividend;
     unsigned m_divisor;
 };
 
-/*
-int main ()
-{
-    Quotient q1(16, -4), q2(6,12), q3(7), q4;
-    q1.print();
-    q2.print();
-    q3.print();
-    q4.print();
-    return 0;
-
-}
-*/
 
 Quotient::Quotient (int dividend, int divisor)
 {
@@ -55,7 +43,7 @@ Quotient::Quotient (int dividend, int divisor)
     m_divisor /= gcd (abs (dividend), abs (divisor));
 }
 
-int Quotient::gcd(int a, unsigned b)
+int Quotient::gcd(int a, int b)
 {
     if (!a || !b)
         return 1;

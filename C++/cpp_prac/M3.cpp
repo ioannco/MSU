@@ -10,7 +10,7 @@ class Rect
     public:
     Rect (int x, int y, unsigned width, unsigned height);
     Rect ();
-    Rect (unsigned size);
+    explicit Rect (unsigned size);
 
     void print_corner () const;
     void print_sz () const;
@@ -19,7 +19,6 @@ class Rect
     bool intersect (const Rect& r) const;
 
     private:
-    bool contains (int x, int y) const;
 
     int m_x, m_y;
     unsigned int m_width, m_height;
@@ -69,15 +68,36 @@ int Rect::perimeter () const
     return static_cast<int>(m_width) * 2 + static_cast<int>(m_height) * 2;
 }
 
-bool Rect::contains (int x, int y) const
-{
-    return (x >= m_x && x <= m_x + m_width) && (y >= m_y && y <= m_y + m_height);
-}
-
 bool Rect::intersect (const Rect& r) const
 {
-    return contains (r.m_x, r.m_y) ||
-           contains (r.m_x + r.m_width, r.m_y + r.m_height) ||
-           contains (r.m_x, r.m_y + r.m_height) ||
-           contains (r.m_x + r.m_width, r.m_y);
+    bool cond1 = m_x <= r.m_x + static_cast<int> (r.m_width);
+    bool cond2 = m_x + static_cast<int> (m_width) >= r.m_x;
+    bool cond3 = m_y <= r.m_y + static_cast<int> (r.m_height);
+    bool cond4 = m_y + static_cast<int> (m_height) >= r.m_y;
+
+    return cond1 && cond2 && cond3 && cond4;
 }
+
+/*
+int main()
+{
+    using namespace std;
+
+    Rect r1(-2, -3, 4, 5);
+    Rect r2;
+    Rect r3(7);
+    r1.print_corner();
+    r1.print_sz();
+
+    int a2 = r2.area();
+    int p2 = r2.perimeter();
+    cout << a2 << " " << p2 << endl;
+
+    if (r1.intersect(r3))
+        cout << "YES";
+    else
+        cout << "NO";
+
+    return 0;
+}
+*/
