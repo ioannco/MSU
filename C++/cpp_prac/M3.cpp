@@ -10,7 +10,7 @@ class Rect
     public:
     Rect (int x, int y, unsigned width, unsigned height);
     Rect ();
-    explicit Rect (unsigned size);
+    Rect (unsigned size);
 
     void print_corner () const;
     void print_sz () const;

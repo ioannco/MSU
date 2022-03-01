@@ -22,19 +22,19 @@ public:
     void insert (const char * c_str, size_t pos);
     void del (size_t i);
     void del (size_t begin, size_t end);
-    size_t search (const char * str) const;
+    int search (const char * str) const;
     void replace (const char * sub_str, const char * new_str);
     void print () const;
 
-    void reserve (size_t bytes);
     friend std::ostream & operator << (std::ostream & left, const mstring & right);
 
 private:
     void realloc (size_t bytes);
+    void reserve (size_t bytes);
 
     char * m_str;      // actual string with \0
     size_t m_reserved, // counts bytes reserved for string
-           m_length;   // actual length, not strlen
+    m_length;   // actual length, not strlen
 
 };
 
@@ -56,18 +56,15 @@ mstring::mstring (const mstring & other) :
 }
 
 mstring::mstring (const char * c_str) :
-    m_str (new char [strlen (c_str) + 1]),
-    m_reserved (strlen (c_str) + 1),
-    m_length (m_reserved)
+        m_str (new char [strlen (c_str) + 1]),
+        m_reserved (strlen (c_str) + 1),
+        m_length (m_reserved)
 {
     std::memcpy (m_str, c_str, m_length);
 }
 
 void mstring::insert (char c, size_t pos)
 {
-    if (pos >= m_length)
-        throw std::invalid_argument ("pos is out of range");
-
     if (!m_str)
         return;
 
@@ -83,12 +80,6 @@ void mstring::insert (char c, size_t pos)
 
 void mstring::insert (const char * c_str, size_t pos)
 {
-    if (pos >= m_length)
-        throw std::invalid_argument ("pos is out of range");
-
-    if (!c_str)
-        throw std::invalid_argument ("string is invalid");
-
     if (!m_str)
         return;
 
@@ -125,7 +116,6 @@ mstring::~mstring ()
 
 void mstring::reserve (size_t bytes)
 {
-
     if (bytes <= m_reserved)
         return;
 
@@ -170,17 +160,15 @@ void mstring::add (const char * c_str)
 
 void mstring::del (size_t i)
 {
-    if (i >= m_length)
-        throw std::invalid_argument ("i is out of range");
-
     if (!m_str)
         return;
 
-    if (m_reserved > 2 * (m_length - 1))
-        mstring::realloc (static_cast<size_t> (static_cast<double> (m_length - 1) * 1.5));
-
     std::memcpy (m_str + i, m_str + i + 1, m_length - i - 1);
     m_length--;
+
+    if (m_reserved > 2 * (m_length))
+        mstring::realloc (static_cast<size_t> (static_cast<double> (m_length) * 1.5 + 1));
+
 }
 
 void mstring::del (size_t begin, size_t end)
@@ -188,37 +176,28 @@ void mstring::del (size_t begin, size_t end)
     if (!m_str)
         return;
 
-    if (begin > end || begin >= m_length || end >= m_length)
-        throw std::invalid_argument ("invalid begin-end range");
-
-    if (m_reserved > 2 * (m_length - (end - begin + 1)))
-        mstring::realloc (static_cast<size_t> (static_cast<double> (m_length - 1) * 1.5));
-
     std::memcpy (m_str + begin, m_str + end + 1, m_length - (end - begin + 1));
     m_length -= end - begin + 1;
+
+    if (m_reserved > 2 * (m_length))
+        mstring::realloc (static_cast<size_t> (static_cast<double> (m_length) * 1.5 + 1));
 }
 
-size_t mstring::search (const char *str) const
+int mstring::search (const char *str) const
 {
-    if (!str)
-        throw std::invalid_argument ("string is invalid");
-
     const char * substr = std::strstr (m_str, str);
 
     if (substr)
-        return substr - m_str;
+        return static_cast<int> (substr - m_str);
 
-    return 0;
+    return -1;
 }
 
 void mstring::replace (const char *sub_str, const char *new_str)
 {
-    if (!new_str)
-        throw std::invalid_argument ("new_str is invalid");
+    int begin = search (sub_str);
 
-    size_t begin = search (sub_str);
-
-    if (!begin)
+    if (begin < 0)
         return;
 
     size_t end = begin + strlen (sub_str) - 1;
@@ -226,15 +205,3 @@ void mstring::replace (const char *sub_str, const char *new_str)
     del (begin, end);
     insert (new_str, begin);
 }
-
-int main()
-{
-    mstring s ("hello world!");
-    s.replace ("world", "mom");
-
-    s.print ();
-
-    return 0;
-}
-
-
