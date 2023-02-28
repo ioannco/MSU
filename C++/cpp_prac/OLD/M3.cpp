@@ -78,7 +78,7 @@ bool Rect::intersect (const Rect& r) const
     return cond1 && cond2 && cond3 && cond4;
 }
 
-
+/*
 int main()
 {
     using namespace std;
@@ -100,4 +100,4 @@ int main()
 
     return 0;
 }
-
+*/

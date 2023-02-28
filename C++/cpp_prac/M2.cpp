@@ -1,64 +1,57 @@
 //
-// Created by Ivan on 2/15/2022.
+// Created by Иван Черемисенов on 14.02.2023.
 //
 
-#include <cstring>
 #include <iostream>
-#include <cstdio>
 #include <cmath>
 
-char * left (char * str, int N);
-unsigned long long left (unsigned long long num, int N);
+class Vector_3d {
+ public:
+	Vector_3d() {
+		m_x = m_y = m_z = 0.;
+	}
 
-int main ()
-{
-    char input [128];
-    int N;
+	Vector_3d(double x, double y, double z) {
+		m_x = x;
+		m_y = y;
+		m_z = z;
+	}
 
-    std::cin >> input;
+	Vector_3d(double num) {
+		m_x = num;
+		m_y = m_z = 0.;
+	}
 
-    if (strcmp (input, "string") == 0)
-    {
-        std::cin.ignore ();
-        std::cin.get (input, 128);
-        std::cin >> N;
-        std::cout << left (input, N) << std::endl;
-    }
-    else if (strcmp (input, "number") == 0)
-    {
-        unsigned long long num = 0;
-        std::cin >> num;
-        std::cin >> N;
-        std::cout << left (num, N) << std::endl;
-    }
+	void print() const {
+		std::cout << '(' << m_x << ',' << m_y << ',' << m_z << ')' << std::endl;
+	}
 
-    return 0;
-}
+	double euc_norm() const {
+		return sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+	}
 
-char * left (char * str, int N)
-{
-    if (!str || N < 0)
-        return nullptr;
+	double max_norm() const {
+		return std::max(std::max(abs(m_x), abs(m_y)), abs(m_z));
+	}
 
-    if (strlen (str) < N)
-        return str;
+	double get_x() const {
+		return m_x;
+	}
 
-    str[N] = '\0';
-    return str;
-}
+	double get_y() const {
+		return m_y;
+	}
 
-unsigned long long left (unsigned long long num, int N)
-{
-    if (N <= 0)
-        return 0;
+	double get_z() const {
+		return m_z;
+	}
 
-    int length = 0;
-    for (unsigned long long num_cpy = num; num_cpy; length++, num_cpy /= 10);
+	void set(double x, double y, double z) {
+		m_x = x;
+		m_y = y;
+		m_z = z;
+	}
 
-    if (N >= length)
-        return num;
-
-    num /= static_cast<unsigned long long> (pow (10, static_cast<int> (length - N)));
-
-    return num;
-}
+ private:
+	double m_x, m_y, m_z;
+};

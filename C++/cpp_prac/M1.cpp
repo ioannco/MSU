@@ -1,57 +1,70 @@
 //
-// Created by Ivan on 2/15/2022.
+// Created by Иван Черемисенов on 14.02.2023.
 //
 
-#include <cmath>
+#include <cstring>
+#include <string>
 #include <iostream>
+#include <cmath>
 
-int count_symbols (int arg);
-int count_symbols (int * arr, int n);
-int count_symbols (int * ptr);
-int count_symbols (char * str);
-int count_symbols (double f, int n = 0);
-
-int count_symbols (int arg)
-{
-    if (!arg)
-        return 1;
-
-    int i = 0;
-
-    for (i; arg; i++)
-        arg /= 10;
-
-    return i;
+const char * right(const char* str, int N) {
+	if (N < 0 || !str)
+		return nullptr;
+	if (N >= strlen(str))
+		return str;
+	return str + (strlen(str) - N);
 }
 
-int count_symbols (int * arr, int n)
-{
-    int sum = 0;
+int digit_count(unsigned long arg) {
+	if (!arg)
+		return 1;
 
-    for (int i = 0; i < n; i++)
-        sum += count_symbols (arr[i]);
+	int i = 0;
 
-    return sum;
+	for (i; arg; i++)
+		arg /= 10;
+
+	return i;
 }
 
-int count_symbols (int * ptr)
-{
-    return count_symbols (*ptr);
+unsigned long pow10(int N) {
+	unsigned long pow = 1;
+	for (int i = 0; i < N; i++)
+		pow = pow * 10;
+	return pow;
 }
 
-int count_symbols (char * str)
-{
-    int n = 0;
-    for (n; *str; n++, str++);
-    return n;
+unsigned long right(unsigned long num, int N) {
+	if (N < 0)
+		return 0;
+
+	int num_size = digit_count(num);
+	if (N >= num_size)
+		return num;
+
+	unsigned long power = pow10(N);
+
+	return num - (num / power) * power;
 }
 
-int count_symbols (double f, int n)
-{
-    if (n)
-        return count_symbols (static_cast<int> (f)) + count_symbols (static_cast<int> ((f - floor(f)) * pow(10, n)));
-    else
-        return count_symbols (static_cast<int> (f));
+int main() {
+	char buff[128];
+	std::cin.getline(buff, 128);
+
+	if (!strcmp(buff, "string")) {
+		int N = 0;
+
+		std::cin.getline(buff, 128);
+		std::cin >> N;
+		std::cout << right(buff, N) << std::endl;
+	} else if (!strcmp(buff, "number")) {
+		unsigned long num = 0;
+		int N = 0;
+
+		std::cin >> num >> N;
+
+		std::cout << right(num, N) << std::endl;
+	}
+
+	return 0;
 }
-
-
