@@ -26,7 +26,23 @@ public:
     void replace (const char * sub_str, const char * new_str);
     void print () const;
 
-    friend std::ostream & operator << (std::ostream & left, const mstring & right);
+	mstring & operator = (const mstring & other);
+
+	mstring operator + (const mstring & other) const;
+	mstring operator * (size_t multiplier) const;
+
+	bool operator > (const mstring & other) const;
+	bool operator < (const mstring & other) const;
+	bool operator >= (const mstring & other) const;
+	bool operator <= (const mstring & other) const;
+	bool operator == (const mstring & other) const;
+
+	char & operator [] (size_t index);
+
+	friend std::ostream & operator << (std::ostream & left, const mstring & right);
+	friend std::istream & operator >> (std::istream & left, mstring & right);
+
+	friend mstring operator*(size_t multiplier, const mstring & other);
 
 private:
     void realloc (size_t bytes);
@@ -102,6 +118,16 @@ std::ostream & operator<< (std::ostream &left, const mstring & right)
 
     left << right.m_str;
     return left;
+}
+
+std::istream & operator>> (std::istream & left, mstring & right) {
+	right = mstring();
+
+	int input = 0;
+	while ((input = std::cin.get()) != '\n' && input != EOF) {
+		right.insert(static_cast<char>(input), right.length());
+	}
+	return left;
 }
 
 void mstring::print () const
@@ -204,4 +230,83 @@ void mstring::replace (const char *sub_str, const char *new_str)
 
     del (begin, end);
     insert (new_str, begin);
+}
+
+mstring mstring::operator+(const mstring& other) const
+{
+	mstring temp(*this);
+	temp.insert(other.m_str, temp.m_length - 1);
+	return temp;
+}
+
+mstring mstring::operator*(size_t multiplier) const
+{
+	mstring temp(*this);
+	temp.reserve(temp.length() * multiplier + 1);
+	for (int i = 1; i < multiplier; i++) {
+		temp = temp + *this;
+	}
+	return temp;
+}
+mstring & mstring::operator=(const mstring& other)
+{
+	if (&other == this)
+		return *this;
+
+	if (m_reserved < other.m_length)
+		reserve(other.m_length);
+
+	std::memcpy(m_str, other.m_str, other.m_length);
+	m_length = other.m_length;
+	return *this;
+}
+
+bool mstring::operator==(const mstring& other) const
+{
+	if (&other == this)
+		return true;
+
+	return m_length == other.m_length && strcmp(m_str, other.m_str) == 0;
+}
+
+mstring operator * (size_t multiplier, const mstring & other){
+	return other * multiplier;
+}
+
+bool mstring::operator>(const mstring& other) const
+{
+	return strcmp(this->m_str, other.m_str) > 0;
+}
+
+bool mstring::operator<(const mstring& other) const
+{
+	return strcmp(this->m_str, other.m_str) < 0;
+}
+
+bool mstring::operator>=(const mstring& other) const
+{
+	return !(*this < other);
+}
+
+bool mstring::operator<=(const mstring& other) const
+{
+	return !(*this > other);
+}
+
+char& mstring::operator[](size_t index)
+{
+	if (index >= length())
+		throw std::invalid_argument("String index out of range");
+
+	return m_str[index];
+}
+
+int main()
+{
+	using namespace std;
+	mstring u("sdfdfgsdfdsf");
+
+	u = mstring("test");
+
+	std::cout << u << std::endl;
 }

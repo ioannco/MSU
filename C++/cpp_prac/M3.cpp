@@ -14,8 +14,8 @@ public:
     Vec (const Vec & other);
     ~Vec ();
 
-    void set (double arg, size_t coord);
-    double get (size_t coord) const;
+    void set (double arg, int coord);
+    double get (int coord) const;
     double euc_norm () const;
     double max_norm () const;
     void print () const;
@@ -50,7 +50,7 @@ Vec::~Vec ()
     m_size = 0;
 }
 
-void Vec::set (double arg, size_t coord)
+void Vec::set (double arg, int coord)
 {
     if (coord >= m_size)
         return; // error
@@ -58,7 +58,7 @@ void Vec::set (double arg, size_t coord)
     m_data[coord] = arg;
 }
 
-double Vec::get (size_t coord) const
+double Vec::get (int coord) const
 {
     if (coord >= m_size)
         return 0; // error

@@ -7,11 +7,23 @@
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
+
+class vec_length_error: public std::length_error {
+ public:
+	explicit vec_length_error(const std::string & error);
+};
+
+
+class vec_index_error: public std::out_of_range {
+ public:
+	explicit vec_index_error(const std::string & error);
+};
 
 class Vec
 {
 public:
-    explicit  Vec (size_t len, double * initializer_list = nullptr);
+    explicit  Vec (int len, double * initializer_list = nullptr);
     Vec (const Vec & other);
     ~Vec ();
 
@@ -25,8 +37,8 @@ public:
     const Vec operator + (const Vec & other) const;
     const Vec operator - (const Vec & other) const;
     bool operator == (const Vec & other) const;
-    double & operator [] (size_t index);
-    double operator [] (size_t index) const;
+    double & operator [] (int index);
+    double operator [] (int index) const;
     const Vec operator * (double right) const;
 
     friend std::ostream & operator << (std::ostream & left, const Vec & right);
@@ -39,10 +51,14 @@ private:
     size_t m_size;
 };
 
-Vec::Vec (size_t len, double * initializer_list) :
-        m_data (new double [len]),
-        m_size (len)
+Vec::Vec (int len, double * initializer_list)
 {
+	if (len < 0)
+		throw vec_length_error("Exception: length error");
+
+	m_size = len;
+	m_data = new double[len];
+
     if (initializer_list)
         std::memcpy (m_data, initializer_list, sizeof (double) * m_size);
     else
@@ -66,16 +82,16 @@ Vec::~Vec ()
 
 void Vec::set (double arg, int coord)
 {
-    if (coord >= m_size)
-        return; // error
+    if (coord < 0 || coord >= m_size)
+        throw vec_index_error("Exception: coordinate error in set()");
 
     m_data[coord] = arg;
 }
 
 double Vec::get (int coord) const
 {
-    if (coord >= m_size)
-        return 0; // error
+    if (coord < 0 || coord >= m_size)
+		throw vec_index_error("Exception: coordinate error in get()");
 
     return m_data[coord];
 }
@@ -123,8 +139,11 @@ Vec & Vec::operator= (const Vec &other)
 
 const Vec Vec::operator+ (const Vec &other) const
 {
-    if (other.m_size != m_size)
-        throw std::invalid_argument ("Vec::operator +: vectors' lengths must be the same");
+    if (other.m_size != m_size) {
+		std::stringstream s;
+		s << "Exception: addition of vectors of different lengths: " << m_size << " " << other.m_size;
+		throw vec_length_error(s.str());
+	}
 
     Vec temp (*this);
     for (size_t i = 0; i < temp.m_size; ++i)
@@ -135,10 +154,13 @@ const Vec Vec::operator+ (const Vec &other) const
 
 const Vec Vec::operator- (const Vec &other) const
 {
-    if (other.m_size != m_size)
-        throw std::invalid_argument ("Vec::operator +: vectors' lengths must be the same");
+	if (other.m_size != m_size) {
+		std::stringstream s;
+		s << "Exception: addition of vectors of different lengths: " << m_size << " " << other.m_size;
+		throw vec_length_error (s.str());
+	}
 
-    Vec temp (*this);
+	Vec temp (*this);
     for (size_t i = 0; i < temp.m_size; ++i)
         temp.m_data[i] -= other.m_data[i];
 
@@ -150,18 +172,26 @@ bool Vec::operator== (const Vec &other) const
     return (m_size == other.m_size) && (!std::memcmp (m_data, other.m_data, m_size * sizeof (double)));
 }
 
-double &Vec::operator[] (size_t index)
+double &Vec::operator[] (int index)
 {
-    if (index >= m_size)
-        throw std::invalid_argument ("Vec::operator[]: vector index out of range");
+    if (index < 0 || index >= m_size)
+	{
+		std::stringstream s;
+		s << "Exception: incorrect indexing: " << index;
+		throw vec_index_error (s.str());
+	}
 
     return m_data[index];
 }
 
-double Vec::operator[] (size_t index) const
+double Vec::operator[] (int index) const
 {
-    if (index >= m_size)
-        throw std::invalid_argument ("Vec::operator[]: vector index out of range");
+	if (index < 0 || index >= m_size)
+	{
+		std::stringstream s;
+		s << "Exception: incorrect indexing: " << index;
+		throw vec_index_error(s.str());
+	}
 
     return m_data[index];
 }
@@ -206,6 +236,26 @@ void Vec::resize (size_t size)
     m_data = nw;
 
     m_size = size;
+}
+
+vec_length_error::vec_length_error(const std::string& error) : length_error(error)
+{
+
+}
+
+vec_index_error::vec_index_error(const std::string& error) : out_of_range(error)
+{
+
+}
+
+int main() {
+	try {
+		error();
+	} catch (std::logic_error & e) {
+		std::cerr << e.what() << std::endl;
+	} catch (...) {
+		std::cerr << "Exception: unknown error" << std::endl;
+	}
 }
 
 
