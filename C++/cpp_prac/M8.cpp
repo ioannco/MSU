@@ -9,13 +9,13 @@ class event {
  public:
 	event();
 	event(const std::string & name, int year, int month, int day);
-	virtual void print_res() const = 0;
+	virtual void print_res() const;
 	virtual void change_grade(int grade) = 0;
 	void change_date(int year, int month, int day);
 
  protected:
-	int day_, month_, year_;
 	std::string name_;
+	int year_, month_, day_;
 };
 
 event::event() :
@@ -40,6 +40,11 @@ void event::change_date(int year, int month, int day)
 	year_ = year;
 	month_ = month;
 	day_ = day;
+}
+
+void event::print_res() const
+{
+	std::cout << name_ << " " << year_ << " " << month_ << " " << day_;
 }
 
 class test : public event {
@@ -75,7 +80,8 @@ void test::change_grade(int grade)
 
 void test::print_res() const
 {
-	std::cout << name_ << " " << year_ << " " << month_ << " " << day_ << " " << (grade_ ? "true" : "false") << std::endl;
+	event::print_res();
+	std::cout << " " << (grade_ ? "true" : "false") << std::endl;
 }
 
 class exam : public event {
@@ -110,5 +116,6 @@ void exam::change_grade(int grade)
 
 void exam::print_res() const
 {
-	std::cout << name_ << " " << year_ << " " << month_ << " " << day_ << " Grade " << grade_ << std::endl;
+	event::print_res();
+	std::cout << " Grade " << grade_ << std::endl;
 }

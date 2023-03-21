@@ -29,7 +29,11 @@ public:
 	mstring & operator = (const mstring & other);
 
 	mstring operator + (const mstring & other) const;
+	mstring operator + (const char * other) const;
+	friend mstring operator + (const char * left, const mstring & other);
+
 	mstring operator * (size_t multiplier) const;
+	friend mstring operator*(size_t multiplier, const mstring & other);
 
 	bool operator > (const mstring & other) const;
 	bool operator < (const mstring & other) const;
@@ -42,7 +46,6 @@ public:
 	friend std::ostream & operator << (std::ostream & left, const mstring & right);
 	friend std::istream & operator >> (std::istream & left, mstring & right);
 
-	friend mstring operator*(size_t multiplier, const mstring & other);
 
 private:
     void realloc (size_t bytes);
@@ -301,12 +304,51 @@ char& mstring::operator[](size_t index)
 	return m_str[index];
 }
 
-int main()
+mstring mstring::operator+(const char* other) const
 {
-	using namespace std;
-	mstring u("sdfdfgsdfdsf");
+	return *this + mstring(other);
+}
 
-	u = mstring("test");
+mstring operator+(const char* left, const mstring& other)
+{
+	return mstring(left) + other;
+}
+
+int main() {
+	mstring u("u123"), v("v123");
+
+	std::cout << u + v << std::endl;
+	std::cout << v + u << std::endl;
+
+	u = u + "right";
+	v = "left" + v;
+
+	std::cout << u << std::endl << v << std::endl;
+
+	u = u + "";
 
 	std::cout << u << std::endl;
+
+	u = "" + mstring("test ");
+
+	std::cout << u << std::endl;
+
+	u = "" + mstring();
+
+	std::cout << u << std::endl;
+
+	std::cout << mstring("a") * 20 + 5 * mstring("b");
+
+	std::cout << mstring() + mstring() << std::endl;
+
+	u = v = mstring(nullptr);
+
+	std::cout << u << " " << v << std::endl;
+
+
+	std::cout << (mstring("a") == mstring("b")) << std::endl;
+	std::cout << (mstring("a") > mstring("b")) << std::endl;
+	std::cout << (mstring("a") < mstring("b")) << std::endl;
+	std::cout << (mstring("a") >= mstring("b")) << std::endl;
+	std::cout << (mstring("a") <= mstring("b")) << std::endl;
 }
