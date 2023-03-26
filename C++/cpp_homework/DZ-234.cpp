@@ -5,6 +5,35 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <sstream>
+
+// EXCEPTIONS ==========================================================================================================
+
+class mstring_param_error : public std::logic_error {
+ public:
+	mstring_param_error(const std::string & method_name, int param1, int param2);
+	mstring_param_error(const std::string & method_name, int param);
+	explicit mstring_param_error(const std::string & what);
+};
+
+mstring_param_error::mstring_param_error(const std::string& method_name, int param1, int param2) :
+	std::logic_error(std::string("Exception: problem in ") + method_name + " incorrect parameter:" +
+					 std::to_string(param1) + " " + std::to_string(param2))
+{
+
+}
+
+mstring_param_error::mstring_param_error(const std::string& method_name, int param) :
+	std::logic_error(std::string("Exception: problem in ") + method_name + " incorrect parameter:" +
+					 std::to_string(param))
+{
+}
+
+mstring_param_error::mstring_param_error(const std::string& what) : logic_error(what)
+{
+}
+
+// MSTRING =============================================================================================================
 
 class mstring
 {
@@ -18,10 +47,11 @@ public:
     bool isempty () const;
     void add (char c);
     void add (const char * c);
-    void insert (char c, size_t pos);
-    void insert (const char * c_str, size_t pos);
-    void del (size_t i);
-    void del (size_t begin, size_t end);
+    void insert (char c, int pos);
+    void insert (const char * c_str, int pos);
+
+    void del (int i);
+    void del (int begin, int end);
     int search (const char * str) const;
     void replace (const char * sub_str, const char * new_str);
     void print () const;
@@ -32,8 +62,8 @@ public:
 	mstring operator + (const char * other) const;
 	friend mstring operator + (const char * left, const mstring & other);
 
-	mstring operator * (size_t multiplier) const;
-	friend mstring operator*(size_t multiplier, const mstring & other);
+	mstring operator * (int multiplier) const;
+	friend mstring operator*(int multiplier, const mstring & other);
 
 	bool operator > (const mstring & other) const;
 	bool operator < (const mstring & other) const;
@@ -41,7 +71,7 @@ public:
 	bool operator <= (const mstring & other) const;
 	bool operator == (const mstring & other) const;
 
-	char & operator [] (size_t index);
+	char & operator [] (int index);
 
 	friend std::ostream & operator << (std::ostream & left, const mstring & right);
 	friend std::istream & operator >> (std::istream & left, mstring & right);
@@ -82,10 +112,13 @@ mstring::mstring (const char * c_str) :
     std::memcpy (m_str, c_str, m_length);
 }
 
-void mstring::insert (char c, size_t pos)
+void mstring::insert (char c, int pos)
 {
     if (!m_str)
         return;
+
+	if (pos < 0 || pos > length())
+		throw mstring_param_error("insert", pos);
 
     if (m_reserved <= m_length + 1)
         mstring::realloc (static_cast<size_t> (static_cast<double> (m_length + 1) * 1.5 + 1));
@@ -97,10 +130,13 @@ void mstring::insert (char c, size_t pos)
     m_length++;
 }
 
-void mstring::insert (const char * c_str, size_t pos)
+void mstring::insert (const char * c_str, int pos)
 {
     if (!m_str)
         return;
+
+	if (pos < 0 || pos > length())
+		throw mstring_param_error("insert", pos);
 
     size_t c_str_len = strlen (c_str);
 
@@ -179,18 +215,21 @@ void mstring::realloc (size_t bytes)
 
 void mstring::add (char c)
 {
-    insert (c, m_length - 1);
+    insert (c, static_cast<int>(m_length) - 1);
 }
 
 void mstring::add (const char * c_str)
 {
-    insert (c_str, m_length - 1);
+    insert (c_str, static_cast<int>(m_length) - 1);
 }
 
-void mstring::del (size_t i)
+void mstring::del (int i)
 {
     if (!m_str)
         return;
+
+	if (i < 0 || i >= length())
+		throw mstring_param_error("del", i);
 
     std::memcpy (m_str + i, m_str + i + 1, m_length - i - 1);
     m_length--;
@@ -200,10 +239,13 @@ void mstring::del (size_t i)
 
 }
 
-void mstring::del (size_t begin, size_t end)
+void mstring::del (int begin, int end)
 {
     if (!m_str)
         return;
+
+	if (begin < 0 || begin > end || end >= length())
+		throw mstring_param_error("del", begin, end);
 
     std::memcpy (m_str + begin, m_str + end + 1, m_length - (end - begin + 1));
     m_length -= end - begin + 1;
@@ -242,8 +284,14 @@ mstring mstring::operator+(const mstring& other) const
 	return temp;
 }
 
-mstring mstring::operator*(size_t multiplier) const
+mstring mstring::operator*(int multiplier) const
 {
+	if (multiplier < 0)
+		throw mstring_param_error("operator*", multiplier);
+
+	if (multiplier == 0)
+		return mstring();
+
 	mstring temp(*this);
 	temp.reserve(temp.length() * multiplier + 1);
 	for (int i = 1; i < multiplier; i++) {
@@ -272,7 +320,7 @@ bool mstring::operator==(const mstring& other) const
 	return m_length == other.m_length && strcmp(m_str, other.m_str) == 0;
 }
 
-mstring operator * (size_t multiplier, const mstring & other){
+mstring operator * (int multiplier, const mstring & other){
 	return other * multiplier;
 }
 
@@ -296,10 +344,10 @@ bool mstring::operator<=(const mstring& other) const
 	return !(*this > other);
 }
 
-char& mstring::operator[](size_t index)
+char& mstring::operator[](int index)
 {
-	if (index >= length())
-		throw std::invalid_argument("String index out of range");
+	if (index < 0 || index >= length())
+		throw mstring_param_error("operator[]", index);
 
 	return m_str[index];
 }
@@ -314,41 +362,11 @@ mstring operator+(const char* left, const mstring& other)
 	return mstring(left) + other;
 }
 
+
 int main() {
-	mstring u("u123"), v("v123");
-
-	std::cout << u + v << std::endl;
-	std::cout << v + u << std::endl;
-
-	u = u + "right";
-	v = "left" + v;
-
-	std::cout << u << std::endl << v << std::endl;
-
-	u = u + "";
-
-	std::cout << u << std::endl;
-
-	u = "" + mstring("test ");
-
-	std::cout << u << std::endl;
-
-	u = "" + mstring();
-
-	std::cout << u << std::endl;
-
-	std::cout << mstring("a") * 20 + 5 * mstring("b");
-
-	std::cout << mstring() + mstring() << std::endl;
-
-	u = v = mstring(nullptr);
-
-	std::cout << u << " " << v << std::endl;
-
-
-	std::cout << (mstring("a") == mstring("b")) << std::endl;
-	std::cout << (mstring("a") > mstring("b")) << std::endl;
-	std::cout << (mstring("a") < mstring("b")) << std::endl;
-	std::cout << (mstring("a") >= mstring("b")) << std::endl;
-	std::cout << (mstring("a") <= mstring("b")) << std::endl;
+	try {
+		error();
+	} catch (std::logic_error & err) {
+		std::cerr << err.what() << std::endl;
+	}
 }
