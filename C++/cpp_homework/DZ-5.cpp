@@ -267,7 +267,8 @@ void ChessChecker::assign_figure(char type, int x, int y) {
 		break;
 
 	case 'N':
-		m_figure = static_cast<Bishop*>(new Knight(x, y));
+		m_figure = static_cast<Rook*>(new Knight(x, y));
+		break;
 
 	default:
 		throw std::invalid_argument("Invalid figure code");
