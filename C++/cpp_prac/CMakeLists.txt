@@ -4,6 +4,8 @@ project (Homework)
 
 file (GLOB MY_SOURCES *.cpp)
 
+set (CMAKE_CXX_STANDARD 11)
+
 foreach  (source_file ${MY_SOURCES})
     get_filename_component(source_name ${source_file} NAME_WE)
 

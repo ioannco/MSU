@@ -21,7 +21,8 @@ T maxn (T * arr, int size) {
 	return max;
 }
 
-const char * maxn(const char ** arr, int size) {
+template <>
+const char * maxn<const char *>(const char ** arr, int size) {
 	if (size <= 0)
 		return nullptr;
 
