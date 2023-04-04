@@ -236,7 +236,6 @@ void mstring::del (int i)
 
     if (m_reserved > 2 * (m_length))
         mstring::realloc (static_cast<size_t> (static_cast<double> (m_length) * 1.5 + 1));
-
 }
 
 void mstring::del (int begin, int end)
@@ -366,7 +365,7 @@ mstring operator+(const char* left, const mstring& other)
 int main() {
 	try {
 		error();
-	} catch (std::logic_error & err) {
+	} catch (std::exception & err) {
 		std::cerr << err.what() << std::endl;
 	}
 }

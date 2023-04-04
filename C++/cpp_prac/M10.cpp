@@ -92,7 +92,7 @@ Vec<T>::~Vec ()
 template<typename T>
 void Vec<T>::set (T arg, int coord)
 {
-	if (coord < 0 || coord >= m_size)
+	if (coord < 0 || static_cast<size_t>(coord) >= m_size)
 		throw vec_index_error("Exception: coordinate error in set()");
 
 	m_data[coord] = arg;
@@ -101,7 +101,7 @@ void Vec<T>::set (T arg, int coord)
 template<typename T>
 T Vec<T>::get (int coord) const
 {
-	if (coord < 0 || coord >= m_size)
+	if (coord < 0 || static_cast<size_t>(coord) >= m_size)
 		throw vec_index_error("Exception: coordinate error in get()");
 
 	return m_data[coord];
@@ -192,7 +192,7 @@ bool Vec<T>::operator== (const Vec<T> &other) const
 template<typename T>
 T &Vec<T>::operator[] (int index)
 {
-	if (index < 0 || index >= m_size)
+	if (index < 0 || static_cast<size_t>(index) >= m_size)
 	{
 		std::stringstream s;
 		s << "Exception: incorrect indexing: " << index;
@@ -205,7 +205,7 @@ T &Vec<T>::operator[] (int index)
 template<typename T>
 T Vec<T>::operator[] (int index) const
 {
-	if (index < 0 || index >= m_size)
+	if (index < 0 || static_cast<size_t>(index) >= m_size)
 	{
 		std::stringstream s;
 		s << "Exception: incorrect indexing: " << index;

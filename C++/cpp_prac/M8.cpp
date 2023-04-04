@@ -12,6 +12,7 @@ class event {
 	virtual void print_res() const;
 	virtual void change_grade(int grade) = 0;
 	void change_date(int year, int month, int day);
+	virtual ~event() = default;
 
  protected:
 	std::string name_;
@@ -52,7 +53,7 @@ class test : public event {
 	test();
 	test(const std::string & name, int year, int month, int day, bool grade);
 
-	virtual void change_grade(int grade);
+	virtual void change_grade(int grade) override;
 	virtual void print_res() const override;
 
   private:
